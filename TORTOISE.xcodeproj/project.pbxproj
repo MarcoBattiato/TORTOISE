@@ -7,7 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		486466052914A40600F18B7D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466042914A40600F18B7D /* main.cpp */; };
+		4864667A2914A4A200F18B7D /* Clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466252914A43500F18B7D /* Clock.cpp */; };
+		4864667B2914A4A200F18B7D /* StringUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466262914A43500F18B7D /* StringUtilities.cpp */; };
+		4864667C2914A4A200F18B7D /* RandomNGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466272914A43500F18B7D /* RandomNGenerator.cpp */; };
+		4864667D2914A4A200F18B7D /* FunctionElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864662B2914A43500F18B7D /* FunctionElement.cpp */; };
+		4864667E2914A4A200F18B7D /* Function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864662C2914A43500F18B7D /* Function.cpp */; };
+		4864667F2914A4A200F18B7D /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864662E2914A43500F18B7D /* Mesh.cpp */; };
+		486466802914A4A200F18B7D /* MeshIterators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864662F2914A43500F18B7D /* MeshIterators.cpp */; };
+		486466812914A4A200F18B7D /* Region.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466302914A43500F18B7D /* Region.cpp */; };
+		486466822914A4A200F18B7D /* MeshSubset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466312914A43500F18B7D /* MeshSubset.cpp */; };
+		486466832914A4A200F18B7D /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466332914A43500F18B7D /* Geometry.cpp */; };
+		486466842914A4A200F18B7D /* AnalyticFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466342914A43500F18B7D /* AnalyticFunction.cpp */; };
+		486466852914A4A200F18B7D /* WeightedFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466362914A43500F18B7D /* WeightedFunction.cpp */; };
+		486466862914A4A200F18B7D /* Plotter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466372914A43500F18B7D /* Plotter.cpp */; };
+		486466872914A4A200F18B7D /* Vlasov.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864663A2914A43500F18B7D /* Vlasov.cpp */; };
+		486466882914A4A200F18B7D /* ScatteringChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864663C2914A43500F18B7D /* ScatteringChannel.cpp */; };
+		486466892914A4A200F18B7D /* IntegratorCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864663D2914A43500F18B7D /* IntegratorCore.cpp */; };
+		4864668A2914A4A200F18B7D /* MaterialStatus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4864663F2914A43500F18B7D /* MaterialStatus.cpp */; };
+		4864668B2914A4A200F18B7D /* MaterialTimeStatus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466402914A43500F18B7D /* MaterialTimeStatus.cpp */; };
+		4864668C2914A4A200F18B7D /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466422914A43500F18B7D /* Material.cpp */; };
+		4864668D2914A4A200F18B7D /* Band.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 486466432914A43500F18B7D /* Band.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +43,73 @@
 
 /* Begin PBXFileReference section */
 		486466012914A40600F18B7D /* TORTOISE */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TORTOISE; sourceTree = BUILT_PRODUCTS_DIR; };
-		486466042914A40600F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4864660D2914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4864660F2914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		486466112914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		486466132914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		486466142914A43500F18B7D /* Tutorials_README.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Tutorials_README.rtf; sourceTree = "<group>"; };
+		486466162914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		486466192914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4864661B2914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4864661D2914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4864661F2914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		486466212914A43500F18B7D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		486466252914A43500F18B7D /* Clock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Clock.cpp; sourceTree = "<group>"; };
+		486466262914A43500F18B7D /* StringUtilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtilities.cpp; sourceTree = "<group>"; };
+		486466272914A43500F18B7D /* RandomNGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RandomNGenerator.cpp; sourceTree = "<group>"; };
+		4864662B2914A43500F18B7D /* FunctionElement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionElement.cpp; sourceTree = "<group>"; };
+		4864662C2914A43500F18B7D /* Function.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Function.cpp; sourceTree = "<group>"; };
+		4864662E2914A43500F18B7D /* Mesh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh.cpp; sourceTree = "<group>"; };
+		4864662F2914A43500F18B7D /* MeshIterators.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MeshIterators.cpp; sourceTree = "<group>"; };
+		486466302914A43500F18B7D /* Region.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Region.cpp; sourceTree = "<group>"; };
+		486466312914A43500F18B7D /* MeshSubset.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MeshSubset.cpp; sourceTree = "<group>"; };
+		486466332914A43500F18B7D /* Geometry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
+		486466342914A43500F18B7D /* AnalyticFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AnalyticFunction.cpp; sourceTree = "<group>"; };
+		486466362914A43500F18B7D /* WeightedFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WeightedFunction.cpp; sourceTree = "<group>"; };
+		486466372914A43500F18B7D /* Plotter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Plotter.cpp; sourceTree = "<group>"; };
+		4864663A2914A43500F18B7D /* Vlasov.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Vlasov.cpp; sourceTree = "<group>"; };
+		4864663C2914A43500F18B7D /* ScatteringChannel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScatteringChannel.cpp; sourceTree = "<group>"; };
+		4864663D2914A43500F18B7D /* IntegratorCore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IntegratorCore.cpp; sourceTree = "<group>"; };
+		4864663F2914A43500F18B7D /* MaterialStatus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaterialStatus.cpp; sourceTree = "<group>"; };
+		486466402914A43500F18B7D /* MaterialTimeStatus.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaterialTimeStatus.cpp; sourceTree = "<group>"; };
+		486466422914A43500F18B7D /* Material.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Material.cpp; sourceTree = "<group>"; };
+		486466432914A43500F18B7D /* Band.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Band.cpp; sourceTree = "<group>"; };
+		486466472914A43500F18B7D /* VectorSpace.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VectorSpace.hpp; sourceTree = "<group>"; };
+		486466482914A43500F18B7D /* MathFieldSpace.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MathFieldSpace.hpp; sourceTree = "<group>"; };
+		4864664A2914A43500F18B7D /* DormandPrince54.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DormandPrince54.hpp; sourceTree = "<group>"; };
+		4864664B2914A43500F18B7D /* RungeKutta4.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RungeKutta4.hpp; sourceTree = "<group>"; };
+		4864664C2914A43500F18B7D /* NelderMead.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NelderMead.hpp; sourceTree = "<group>"; };
+		4864664E2914A43500F18B7D /* StringUtilities.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = StringUtilities.hpp; sourceTree = "<group>"; };
+		4864664F2914A43500F18B7D /* DataMatrix.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DataMatrix.hpp; sourceTree = "<group>"; };
+		486466502914A43500F18B7D /* DataFromFile.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DataFromFile.hpp; sourceTree = "<group>"; };
+		486466512914A43500F18B7D /* RandomNGenerator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RandomNGenerator.hpp; sourceTree = "<group>"; };
+		486466522914A43500F18B7D /* Clock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Clock.hpp; sourceTree = "<group>"; };
+		486466542914A43500F18B7D /* StringMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = StringMap.hpp; sourceTree = "<group>"; };
+		486466552914A43500F18B7D /* UnivariateRelationContainer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UnivariateRelationContainer.hpp; sourceTree = "<group>"; };
+		486466562914A43500F18B7D /* PhysicsCore */ = {isa = PBXFileReference; lastKnownFileType = text; path = PhysicsCore; sourceTree = "<group>"; };
+		486466572914A43500F18B7D /* MiscUtilities */ = {isa = PBXFileReference; lastKnownFileType = text; path = MiscUtilities; sourceTree = "<group>"; };
+		486466582914A43500F18B7D /* Configuration */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration; sourceTree = "<group>"; };
+		4864665C2914A43500F18B7D /* Function.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Function.hpp; sourceTree = "<group>"; };
+		4864665D2914A43500F18B7D /* FunctionElement.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FunctionElement.hpp; sourceTree = "<group>"; };
+		4864665F2914A43500F18B7D /* Region.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Region.hpp; sourceTree = "<group>"; };
+		486466602914A43500F18B7D /* MeshSubset.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MeshSubset.hpp; sourceTree = "<group>"; };
+		486466612914A43500F18B7D /* Mesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Mesh.hpp; sourceTree = "<group>"; };
+		486466622914A43500F18B7D /* MeshIterators.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MeshIterators.hpp; sourceTree = "<group>"; };
+		486466642914A43500F18B7D /* AnalyticFunction.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AnalyticFunction.hpp; sourceTree = "<group>"; };
+		486466652914A43500F18B7D /* Geometry.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
+		486466672914A43500F18B7D /* WeightedFunction.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = WeightedFunction.hpp; sourceTree = "<group>"; };
+		486466682914A43500F18B7D /* Plotter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Plotter.hpp; sourceTree = "<group>"; };
+		4864666B2914A43500F18B7D /* Vlasov.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Vlasov.hpp; sourceTree = "<group>"; };
+		4864666D2914A43500F18B7D /* IntegratorCore.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IntegratorCore.hpp; sourceTree = "<group>"; };
+		4864666E2914A43500F18B7D /* ScatteringChannel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ScatteringChannel.hpp; sourceTree = "<group>"; };
+		486466702914A43500F18B7D /* MaterialTimeStatus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaterialTimeStatus.hpp; sourceTree = "<group>"; };
+		486466712914A43500F18B7D /* MaterialStatus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaterialStatus.hpp; sourceTree = "<group>"; };
+		486466732914A43500F18B7D /* Material.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Material.hpp; sourceTree = "<group>"; };
+		486466742914A43500F18B7D /* Band.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Band.hpp; sourceTree = "<group>"; };
+		486466752914A43500F18B7D /* DiscretizationCore */ = {isa = PBXFileReference; lastKnownFileType = text; path = DiscretizationCore; sourceTree = "<group>"; };
+		486466762914A43500F18B7D /* TORTOISE */ = {isa = PBXFileReference; lastKnownFileType = text; path = TORTOISE; sourceTree = "<group>"; };
+		486466782914A43500F18B7D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		486466792914A43500F18B7D /* README.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.rtf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +142,427 @@
 		486466032914A40600F18B7D /* TORTOISE */ = {
 			isa = PBXGroup;
 			children = (
-				486466042914A40600F18B7D /* main.cpp */,
+				486466772914A43500F18B7D /* doc */,
+				486466202914A43500F18B7D /* examples */,
+				486466442914A43500F18B7D /* include */,
+				486466222914A43500F18B7D /* src */,
+				4864660B2914A43500F18B7D /* tutorials */,
 			);
 			path = TORTOISE;
+			sourceTree = "<group>";
+		};
+		4864660B2914A43500F18B7D /* tutorials */ = {
+			isa = PBXGroup;
+			children = (
+				4864660C2914A43500F18B7D /* tutorial3 */,
+				4864660E2914A43500F18B7D /* tutorial4 */,
+				486466102914A43500F18B7D /* tutorial5 */,
+				486466122914A43500F18B7D /* tutorial2 */,
+				486466142914A43500F18B7D /* Tutorials_README.rtf */,
+				486466152914A43500F18B7D /* tutorial1 */,
+				486466172914A43500F18B7D /* developers */,
+			);
+			path = tutorials;
+			sourceTree = "<group>";
+		};
+		4864660C2914A43500F18B7D /* tutorial3 */ = {
+			isa = PBXGroup;
+			children = (
+				4864660D2914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorial3;
+			sourceTree = "<group>";
+		};
+		4864660E2914A43500F18B7D /* tutorial4 */ = {
+			isa = PBXGroup;
+			children = (
+				4864660F2914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorial4;
+			sourceTree = "<group>";
+		};
+		486466102914A43500F18B7D /* tutorial5 */ = {
+			isa = PBXGroup;
+			children = (
+				486466112914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorial5;
+			sourceTree = "<group>";
+		};
+		486466122914A43500F18B7D /* tutorial2 */ = {
+			isa = PBXGroup;
+			children = (
+				486466132914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorial2;
+			sourceTree = "<group>";
+		};
+		486466152914A43500F18B7D /* tutorial1 */ = {
+			isa = PBXGroup;
+			children = (
+				486466162914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorial1;
+			sourceTree = "<group>";
+		};
+		486466172914A43500F18B7D /* developers */ = {
+			isa = PBXGroup;
+			children = (
+				486466182914A43500F18B7D /* tutorialDev1 */,
+				4864661A2914A43500F18B7D /* tutorialDev2 */,
+				4864661C2914A43500F18B7D /* tutorialDev3 */,
+				4864661E2914A43500F18B7D /* tutorialDev4 */,
+			);
+			path = developers;
+			sourceTree = "<group>";
+		};
+		486466182914A43500F18B7D /* tutorialDev1 */ = {
+			isa = PBXGroup;
+			children = (
+				486466192914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorialDev1;
+			sourceTree = "<group>";
+		};
+		4864661A2914A43500F18B7D /* tutorialDev2 */ = {
+			isa = PBXGroup;
+			children = (
+				4864661B2914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorialDev2;
+			sourceTree = "<group>";
+		};
+		4864661C2914A43500F18B7D /* tutorialDev3 */ = {
+			isa = PBXGroup;
+			children = (
+				4864661D2914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorialDev3;
+			sourceTree = "<group>";
+		};
+		4864661E2914A43500F18B7D /* tutorialDev4 */ = {
+			isa = PBXGroup;
+			children = (
+				4864661F2914A43500F18B7D /* main.cpp */,
+			);
+			path = tutorialDev4;
+			sourceTree = "<group>";
+		};
+		486466202914A43500F18B7D /* examples */ = {
+			isa = PBXGroup;
+			children = (
+				486466212914A43500F18B7D /* main.cpp */,
+			);
+			path = examples;
+			sourceTree = "<group>";
+		};
+		486466222914A43500F18B7D /* src */ = {
+			isa = PBXGroup;
+			children = (
+				486466232914A43500F18B7D /* Generics */,
+				486466282914A43500F18B7D /* Geometry */,
+				486466382914A43500F18B7D /* Physics */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		486466232914A43500F18B7D /* Generics */ = {
+			isa = PBXGroup;
+			children = (
+				486466242914A43500F18B7D /* Utilities */,
+			);
+			path = Generics;
+			sourceTree = "<group>";
+		};
+		486466242914A43500F18B7D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				486466252914A43500F18B7D /* Clock.cpp */,
+				486466262914A43500F18B7D /* StringUtilities.cpp */,
+				486466272914A43500F18B7D /* RandomNGenerator.cpp */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		486466282914A43500F18B7D /* Geometry */ = {
+			isa = PBXGroup;
+			children = (
+				486466292914A43500F18B7D /* Structured */,
+				486466322914A43500F18B7D /* GeometryCore */,
+				486466352914A43500F18B7D /* Plotter */,
+			);
+			path = Geometry;
+			sourceTree = "<group>";
+		};
+		486466292914A43500F18B7D /* Structured */ = {
+			isa = PBXGroup;
+			children = (
+				4864662A2914A43500F18B7D /* FunctionSpace */,
+				4864662D2914A43500F18B7D /* DirectSpace */,
+			);
+			path = Structured;
+			sourceTree = "<group>";
+		};
+		4864662A2914A43500F18B7D /* FunctionSpace */ = {
+			isa = PBXGroup;
+			children = (
+				4864662B2914A43500F18B7D /* FunctionElement.cpp */,
+				4864662C2914A43500F18B7D /* Function.cpp */,
+			);
+			path = FunctionSpace;
+			sourceTree = "<group>";
+		};
+		4864662D2914A43500F18B7D /* DirectSpace */ = {
+			isa = PBXGroup;
+			children = (
+				4864662E2914A43500F18B7D /* Mesh.cpp */,
+				4864662F2914A43500F18B7D /* MeshIterators.cpp */,
+				486466302914A43500F18B7D /* Region.cpp */,
+				486466312914A43500F18B7D /* MeshSubset.cpp */,
+			);
+			path = DirectSpace;
+			sourceTree = "<group>";
+		};
+		486466322914A43500F18B7D /* GeometryCore */ = {
+			isa = PBXGroup;
+			children = (
+				486466332914A43500F18B7D /* Geometry.cpp */,
+				486466342914A43500F18B7D /* AnalyticFunction.cpp */,
+			);
+			path = GeometryCore;
+			sourceTree = "<group>";
+		};
+		486466352914A43500F18B7D /* Plotter */ = {
+			isa = PBXGroup;
+			children = (
+				486466362914A43500F18B7D /* WeightedFunction.cpp */,
+				486466372914A43500F18B7D /* Plotter.cpp */,
+			);
+			path = Plotter;
+			sourceTree = "<group>";
+		};
+		486466382914A43500F18B7D /* Physics */ = {
+			isa = PBXGroup;
+			children = (
+				486466392914A43500F18B7D /* Transport */,
+				4864663B2914A43500F18B7D /* Scattering */,
+				4864663E2914A43500F18B7D /* Status */,
+				486466412914A43500F18B7D /* Material */,
+			);
+			path = Physics;
+			sourceTree = "<group>";
+		};
+		486466392914A43500F18B7D /* Transport */ = {
+			isa = PBXGroup;
+			children = (
+				4864663A2914A43500F18B7D /* Vlasov.cpp */,
+			);
+			path = Transport;
+			sourceTree = "<group>";
+		};
+		4864663B2914A43500F18B7D /* Scattering */ = {
+			isa = PBXGroup;
+			children = (
+				4864663C2914A43500F18B7D /* ScatteringChannel.cpp */,
+				4864663D2914A43500F18B7D /* IntegratorCore.cpp */,
+			);
+			path = Scattering;
+			sourceTree = "<group>";
+		};
+		4864663E2914A43500F18B7D /* Status */ = {
+			isa = PBXGroup;
+			children = (
+				4864663F2914A43500F18B7D /* MaterialStatus.cpp */,
+				486466402914A43500F18B7D /* MaterialTimeStatus.cpp */,
+			);
+			path = Status;
+			sourceTree = "<group>";
+		};
+		486466412914A43500F18B7D /* Material */ = {
+			isa = PBXGroup;
+			children = (
+				486466422914A43500F18B7D /* Material.cpp */,
+				486466432914A43500F18B7D /* Band.cpp */,
+			);
+			path = Material;
+			sourceTree = "<group>";
+		};
+		486466442914A43500F18B7D /* include */ = {
+			isa = PBXGroup;
+			children = (
+				486466452914A43500F18B7D /* Generics */,
+				486466562914A43500F18B7D /* PhysicsCore */,
+				486466572914A43500F18B7D /* MiscUtilities */,
+				486466582914A43500F18B7D /* Configuration */,
+				486466592914A43500F18B7D /* Geometry */,
+				486466692914A43500F18B7D /* Physics */,
+				486466752914A43500F18B7D /* DiscretizationCore */,
+				486466762914A43500F18B7D /* TORTOISE */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		486466452914A43500F18B7D /* Generics */ = {
+			isa = PBXGroup;
+			children = (
+				486466462914A43500F18B7D /* Features */,
+				486466492914A43500F18B7D /* Algorithms */,
+				4864664D2914A43500F18B7D /* Utilities */,
+				486466532914A43500F18B7D /* Containers */,
+			);
+			path = Generics;
+			sourceTree = "<group>";
+		};
+		486466462914A43500F18B7D /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				486466472914A43500F18B7D /* VectorSpace.hpp */,
+				486466482914A43500F18B7D /* MathFieldSpace.hpp */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		486466492914A43500F18B7D /* Algorithms */ = {
+			isa = PBXGroup;
+			children = (
+				4864664A2914A43500F18B7D /* DormandPrince54.hpp */,
+				4864664B2914A43500F18B7D /* RungeKutta4.hpp */,
+				4864664C2914A43500F18B7D /* NelderMead.hpp */,
+			);
+			path = Algorithms;
+			sourceTree = "<group>";
+		};
+		4864664D2914A43500F18B7D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				4864664E2914A43500F18B7D /* StringUtilities.hpp */,
+				4864664F2914A43500F18B7D /* DataMatrix.hpp */,
+				486466502914A43500F18B7D /* DataFromFile.hpp */,
+				486466512914A43500F18B7D /* RandomNGenerator.hpp */,
+				486466522914A43500F18B7D /* Clock.hpp */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		486466532914A43500F18B7D /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				486466542914A43500F18B7D /* StringMap.hpp */,
+				486466552914A43500F18B7D /* UnivariateRelationContainer.hpp */,
+			);
+			path = Containers;
+			sourceTree = "<group>";
+		};
+		486466592914A43500F18B7D /* Geometry */ = {
+			isa = PBXGroup;
+			children = (
+				4864665A2914A43500F18B7D /* Structured */,
+				486466632914A43500F18B7D /* GeometryCore */,
+				486466662914A43500F18B7D /* Plotter */,
+			);
+			path = Geometry;
+			sourceTree = "<group>";
+		};
+		4864665A2914A43500F18B7D /* Structured */ = {
+			isa = PBXGroup;
+			children = (
+				4864665B2914A43500F18B7D /* FunctionSpace */,
+				4864665E2914A43500F18B7D /* DirectSpace */,
+			);
+			path = Structured;
+			sourceTree = "<group>";
+		};
+		4864665B2914A43500F18B7D /* FunctionSpace */ = {
+			isa = PBXGroup;
+			children = (
+				4864665C2914A43500F18B7D /* Function.hpp */,
+				4864665D2914A43500F18B7D /* FunctionElement.hpp */,
+			);
+			path = FunctionSpace;
+			sourceTree = "<group>";
+		};
+		4864665E2914A43500F18B7D /* DirectSpace */ = {
+			isa = PBXGroup;
+			children = (
+				4864665F2914A43500F18B7D /* Region.hpp */,
+				486466602914A43500F18B7D /* MeshSubset.hpp */,
+				486466612914A43500F18B7D /* Mesh.hpp */,
+				486466622914A43500F18B7D /* MeshIterators.hpp */,
+			);
+			path = DirectSpace;
+			sourceTree = "<group>";
+		};
+		486466632914A43500F18B7D /* GeometryCore */ = {
+			isa = PBXGroup;
+			children = (
+				486466642914A43500F18B7D /* AnalyticFunction.hpp */,
+				486466652914A43500F18B7D /* Geometry.hpp */,
+			);
+			path = GeometryCore;
+			sourceTree = "<group>";
+		};
+		486466662914A43500F18B7D /* Plotter */ = {
+			isa = PBXGroup;
+			children = (
+				486466672914A43500F18B7D /* WeightedFunction.hpp */,
+				486466682914A43500F18B7D /* Plotter.hpp */,
+			);
+			path = Plotter;
+			sourceTree = "<group>";
+		};
+		486466692914A43500F18B7D /* Physics */ = {
+			isa = PBXGroup;
+			children = (
+				4864666A2914A43500F18B7D /* Transport */,
+				4864666C2914A43500F18B7D /* Scattering */,
+				4864666F2914A43500F18B7D /* Status */,
+				486466722914A43500F18B7D /* Material */,
+			);
+			path = Physics;
+			sourceTree = "<group>";
+		};
+		4864666A2914A43500F18B7D /* Transport */ = {
+			isa = PBXGroup;
+			children = (
+				4864666B2914A43500F18B7D /* Vlasov.hpp */,
+			);
+			path = Transport;
+			sourceTree = "<group>";
+		};
+		4864666C2914A43500F18B7D /* Scattering */ = {
+			isa = PBXGroup;
+			children = (
+				4864666D2914A43500F18B7D /* IntegratorCore.hpp */,
+				4864666E2914A43500F18B7D /* ScatteringChannel.hpp */,
+			);
+			path = Scattering;
+			sourceTree = "<group>";
+		};
+		4864666F2914A43500F18B7D /* Status */ = {
+			isa = PBXGroup;
+			children = (
+				486466702914A43500F18B7D /* MaterialTimeStatus.hpp */,
+				486466712914A43500F18B7D /* MaterialStatus.hpp */,
+			);
+			path = Status;
+			sourceTree = "<group>";
+		};
+		486466722914A43500F18B7D /* Material */ = {
+			isa = PBXGroup;
+			children = (
+				486466732914A43500F18B7D /* Material.hpp */,
+				486466742914A43500F18B7D /* Band.hpp */,
+			);
+			path = Material;
+			sourceTree = "<group>";
+		};
+		486466772914A43500F18B7D /* doc */ = {
+			isa = PBXGroup;
+			children = (
+				486466782914A43500F18B7D /* Makefile */,
+				486466792914A43500F18B7D /* README.rtf */,
+			);
+			path = doc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,7 +622,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				486466052914A40600F18B7D /* main.cpp in Sources */,
+				4864667A2914A4A200F18B7D /* Clock.cpp in Sources */,
+				4864667B2914A4A200F18B7D /* StringUtilities.cpp in Sources */,
+				4864667C2914A4A200F18B7D /* RandomNGenerator.cpp in Sources */,
+				4864667D2914A4A200F18B7D /* FunctionElement.cpp in Sources */,
+				4864667E2914A4A200F18B7D /* Function.cpp in Sources */,
+				4864667F2914A4A200F18B7D /* Mesh.cpp in Sources */,
+				486466802914A4A200F18B7D /* MeshIterators.cpp in Sources */,
+				486466812914A4A200F18B7D /* Region.cpp in Sources */,
+				486466822914A4A200F18B7D /* MeshSubset.cpp in Sources */,
+				486466832914A4A200F18B7D /* Geometry.cpp in Sources */,
+				486466842914A4A200F18B7D /* AnalyticFunction.cpp in Sources */,
+				486466852914A4A200F18B7D /* WeightedFunction.cpp in Sources */,
+				486466862914A4A200F18B7D /* Plotter.cpp in Sources */,
+				486466872914A4A200F18B7D /* Vlasov.cpp in Sources */,
+				486466882914A4A200F18B7D /* ScatteringChannel.cpp in Sources */,
+				486466892914A4A200F18B7D /* IntegratorCore.cpp in Sources */,
+				4864668A2914A4A200F18B7D /* MaterialStatus.cpp in Sources */,
+				4864668B2914A4A200F18B7D /* MaterialTimeStatus.cpp in Sources */,
+				4864668C2914A4A200F18B7D /* Material.cpp in Sources */,
+				4864668D2914A4A200F18B7D /* Band.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,7 +654,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -165,7 +687,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -176,6 +698,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"./TORTOISE/include/**",
+					"/usr/local/Cellar/eigen/3.4.0/**",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -190,7 +716,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -222,12 +748,17 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"./TORTOISE/include/**",
+					"/usr/local/Cellar/eigen/3.4.0/**",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
