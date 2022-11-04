@@ -1,0 +1,178 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww19980\viewh14520\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 TORTOISE is a C++ library and therefore it requires a main file to be built by the user.\
+\
+Requirements:\
+\
+- TORTOISE uses Eigen (https://eigen.tuxfamily.org). A working installation of Eigen, accessible to the compiler is necessary to run TORTOISE.\
+- TORTOISE produces plots by calling GNUPlot (http://www.gnuplot.info). A working version of GNUPlot is necessary to be able to access plotting functionalities.\
+- TORTOISE is written in C++20 and requires the appropriate compiler flag to be compiled\
+- TORTOISE is built using techniques that leverage the optimisation flag -O3. \
+- TORTOISE needs to know how to call GNUPlot. Therefore the user has to specify in the Configuration file GNUPlot's full path and executable.\
+\
+TORTOISE comes with tutorials and examples on how to use the library.\
+The user is expected to write his/her own main file (as well as other project files, when necessary).\
+\
+TORTOISE is included with\
+#include <TORTOISE>\
+\
+Available functionalities can be found in the manual or directly from the header files.\
+\
+If using an IDE, the user should make sure that Eigen's directory and TORTOISE/include directory are among the header search paths.\
+Also all the files within TORTOISE/src have to be provided to the compiler as source files.\
+The source should be compiles with the -std:c++20 flag.\
+The compilation should be done at the optimisation level -O3\
+\
+Otherwise a makefile is provided.\
+\
+\
+Several examples can be found in the gitHub repository of the project.\
+\
+\
+TORTOISE is split over the following directory tree and files\
+|-- doc\
+|   > README.rtf\
+|\
+|-- Includes\
+|   > TORTOISE\
+|   > Configuration\
+|   > MishUtilities\
+|   > DiscretizationCore\
+|   > PhysicsCore\
+|\
+|-- Generics\
+|    |-- Features\
+|    |   > MathFieldSpace.hpp\
+|    |   > VectorSpace.hpp\
+|    |\
+|    |-- Containers\
+|    |   > StringMap.hpp\
+|    |   > UnivariateRelationContainer.hpp\
+|    |   \
+|    |-- Algorithms\
+|    |   > RungeKutta4.hpp\
+|    |   > DormandPrince54.hpp\
+|    |   > NelderMead.hpp\
+|    |   \
+|    |-- Utilities\
+|    |   > DataMatrix.hpp\
+|    |   > DataFromFile.hpp\
+|    |   > StringUtilities.hpp\
+|    |   > Clock.hpp\
+|    |   > RandomNGenerator.hpp\
+|\
+|-- Geometry\
+|    |-- GeometryCore\
+|    |   > Geometry.hpp\
+|    |   > AnalyticFunction.hpp\
+|    |\
+|    |-- Plotter\
+|    |   > Plotter.hpp\
+|    |   > WeightedFunction.hpp\
+|    |\
+|    |-- Structured\
+|    |    |-- DirectSpace\
+|    |    |   > Region.hpp\
+|    |    |   > Mesh.hpp\
+|    |    |   > MeshSubset.hpp\
+|    |    |   > MeshIterators.hpp\
+|    |    |\
+|    |    |-- Dual Space\
+|    |    |   > Function.hpp\
+|    |    |   > FunctionElement.hpp\
+|\
+|-- Physics\
+|    |-- DGIntegrators\
+|    |   > Vlasov.hpp\
+|    |  \
+|    |-- Material\
+|    |   > Band.hpp\
+|    |   > Material.hpp\
+|    |  \
+|    |-- Status\
+|    |   > MaterialStatus.hpp\
+|    |   > MaterialTimeStatus.hpp\
+|    |\
+|    |-- Scattering\
+|    |   > IntegratorCore.hpp\
+|    |   > ScatteringChannel.hpp\
+|\
+|-- Generics\
+|    |-- Utilities\
+|    |   > StringUtilities.cpp\
+|    |   > Clock.cpp\
+|    |   > RandomNGenerator.cpp\
+|\
+|-- Geometry\
+|    |-- GeometryCore\
+|    |   > Geometry.cpp\
+|    |   > AnalyticFunction.cpp\
+|    |\
+|    |-- Plotter\
+|    |   > Plotter.cpp\
+|    |   > WeightedFunction.cpp\
+|    |\
+|    |-- Structured\
+|    |    |-- DirectSpace\
+|    |    |   > Region.cpp\
+|    |    |   > Mesh.hpp\
+|    |    |   > MeshSubset.hpp\
+|    |    |   > MeshIterators.hpp\
+|    |    |\
+|    |    |-- Dual Space\
+|    |    |   > Function.hpp\
+|    |    |   > FunctionElement.hpp\
+|\
+|-- Physics\
+|    |-- DGIntegrators\
+|    |   > Vlasov.cpp\
+|    |  \
+|    |-- Material\
+|    |   > Band.cpp\
+|    |   > Material.cpp\
+|    |  \
+|    |-- Status\
+|    |   > MaterialStatus.cpp\
+|    |   > MaterialTimeStatus.cpp\
+|    |\
+|    |-- Scattering\
+|    |   > IntegratorCore.cpp\
+|    |   > ScatteringChannel.cpp\
+|\
+|-- Examples\
+|   > main.cpp\
+|\
+|-- Tutorials\
+|   > Tutorials_README.rtf\
+|   |-- tutorial1\
+|   |   > main.cpp\
+|   |\
+|   |-- tutorial2\
+|   |   > main.cpp\
+|   |\
+|   |-- tutorial3\
+|   |   > main.cpp\
+|   |\
+|   |-- tutorial4\
+|   |   > main.cpp\
+|   |\
+|   |-- tutorial5\
+|   |   > main.cpp\
+|   |\
+|   |-- developers\
+|   |   |-- tutorialDev1\
+|   |   |   > main.cpp\
+|   |   |\
+|   |   |-- tutorialDev2\
+|   |   |   > main.cpp\
+|   |   |\
+|   |   |-- tutorialDev3\
+|   |   |   > main.cpp\
+|   |   |\
+|   |   |-- tutorialDev4\
+|   |   |   > main.cpp}

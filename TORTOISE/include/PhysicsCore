@@ -1,0 +1,27 @@
+//
+//  PhysicsCore.h
+//  TORTOISE
+//
+//  Created by Marco Battiato on 27/10/22.
+//
+
+#ifndef PhysicsCore_h
+#define PhysicsCore_h
+
+#include "Configuration"
+#include "MiscUtilities"
+#include "DiscretizationCore"
+
+#include "Physics/Transport/Vlasov.hpp"
+
+#include "Physics/Material/Band.hpp"
+
+#include "Physics/Scattering/IntegratorCore.hpp"
+#include "Physics/Scattering/ScatteringChannel.hpp"
+
+#include "Physics/Material/Material.hpp"
+
+#include "Physics/Status/MaterialStatus.hpp"
+#include "Physics/Status/MaterialTimeStatus.hpp"
+
+#endif /* PhysicsCore_h */

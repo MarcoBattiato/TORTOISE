@@ -1,0 +1,71 @@
+// Copyright © 2019, Marco Battiato <marco.battiato@ntu.edu.sg; battiato.marco@gmail.com>, All rights reserved.
+//
+// Licensed under the GNU GENERAL PUBLIC LICENSE Version 3 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   https://www.gnu.org/licenses/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// permissions and limitations under the License.
+//
+//
+// DISCLAIMER: This is a version under active development and testing.
+// Not all features have been sufficiently tested, and several features
+// are only partially implemented. Moreover both the core and the interface
+// may change. You are discouraged from using this version to publish
+// results without the supervision of the developer.
+//
+// If you want, you are welcome to act as a beta tester. In that case
+// please contact Marco Battiato at:
+// marco.battiato@ntu.edu.sg or battiato.marco@gmail.com
+//
+// Check if a newer, stable and tested version has, in the meanwhile,
+// been made available at:
+// https://github.com/MarcoBattiato/TORTOISE
+//
+//
+//  DiscretizationCore.hpp
+//  TORTOISE
+//
+//  Created by Marco Battiato on 24/8/21.
+//
+
+#ifndef DiscretizationCore_hpp
+#define DiscretizationCore_hpp
+
+#include "Configuration"
+#include "MiscUtilities"
+
+#include "Generics/Features/MathFieldSpace.hpp"
+#include "Generics/Features/VectorSpace.hpp"
+
+#include "Generics/Containers/StringMap.hpp"
+#include "Generics/Containers/UnivariateRelationContainer.hpp"
+
+#include "Generics/Algorithms/RungeKutta4.hpp"
+#include "Generics/Algorithms/DormandPrince54.hpp"
+#include "Generics/Algorithms/NelderMead.hpp"
+
+#include "Geometry/GeometryCore/Geometry.hpp"
+#include "Geometry/GeometryCore/AnalyticFunction.hpp"
+
+#include "Geometry/Plotter/Plotter.hpp"
+
+#include "Geometry/Structured/DirectSpace/MeshIterators.hpp"
+#include "Geometry/Structured/DirectSpace/Region.hpp"
+#include "Geometry/Structured/DirectSpace/Mesh.hpp"
+#include "Geometry/Structured/DirectSpace/MeshSubset.hpp"
+
+#include "Geometry/Structured/FunctionSpace/FunctionElement.hpp"
+#include "Geometry/Structured/FunctionSpace/Function.hpp"
+
+#include "Generics/Utilities/DataMatrix.hpp"
+#include "Generics/Utilities/DataFromFile.hpp"
+
+#include "Geometry/Plotter/WeightedFunction.hpp"
+
+#endif /* DiscretizationCore_hpp */
