@@ -481,7 +481,7 @@ template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteri
     Eigen::Matrix<Real, Nlegs*(NDim+1), 1> result = scatteringIntegrationTypeB<NDim, Nlegs>(D, N, commonLinForm0, commonLinForm1, outputformsLinForm, nMCpoints).eval();
     result *= fullAmplitude;
     // Returns only the rate for the selected particle
-    rates[legBandNumber[which]].elementVec(elemID[which]) += result.template block<NDim+1,1>(which*(NDim+1),0) ;
+    rates[legBandNumber[which]].elementVec(elemID[which]) += legDirection[i] * result.template block<NDim+1,1>(which*(NDim+1),0) ;
     
 };
 
