@@ -464,13 +464,13 @@ template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteri
     unit(0) = 1.0;
     for (int leg=0; leg<Nlegs; ++leg) {
         if (leg == which) {
-            commonLinForm0.template block<1,NDim+1>(0,leg*(NDim+1)) = unit; // in
-            commonLinForm1.template block<1,NDim+1>(0,leg*(NDim+1)) = - legBand[leg]->statistics * unit; // out
+            commonLinForm0.template block<1,NDim+1>(0,leg*(NDim+1)) = (leg==0?-1.0:1.0) * ( (1. - legDirection[leg]) * legBand[leg]->statistics + (1. + legDirection[leg]) ) * unit; // in
+            commonLinForm1.template block<1,NDim+1>(0,leg*(NDim+1)) = ( (1. + legDirection[leg]) * legBand[leg]->statistics + (1. - legDirection[leg]) ) * unit; // out
         } else {
-        commonLinForm0.template block<1,NDim+1>(0,leg*(NDim+1)) = 0.5 * ((1. - legDirection[leg]) * unit
-            + ( (1. - legDirection[leg]) * legBand[leg]->statistics + (1. + legDirection[leg]) ) * status[legBandNumber[leg]].elementVec(elemID[leg]));    // Direct transition
-        commonLinForm1.template block<1,NDim+1>(0,leg*(NDim+1)) = 0.5 * ( (1. + legDirection[leg]) * unit
-            + ( (1. + legDirection[leg]) * legBand[leg]->statistics + (1. - legDirection[leg]) ) * status[legBandNumber[leg]].elementVec(elemID[leg]));    // Time reversed transition
+            commonLinForm0.template block<1,NDim+1>(0,leg*(NDim+1)) = (leg==0?-1.0:1.0) * 0.5 * ((1. - legDirection[leg]) * unit
+                + ( (1. - legDirection[leg]) * legBand[leg]->statistics + (1. + legDirection[leg]) ) * status[legBandNumber[leg]].elementVec(elemID[leg]));    // Direct transition
+            commonLinForm1.template block<1,NDim+1>(0,leg*(NDim+1)) = 0.5 * ( (1. + legDirection[leg]) * unit
+                + ( (1. + legDirection[leg]) * legBand[leg]->statistics + (1. - legDirection[leg]) ) * status[legBandNumber[leg]].elementVec(elemID[leg]));    // Time reversed transition
         }
     }
 
@@ -481,7 +481,7 @@ template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteri
     Eigen::Matrix<Real, Nlegs*(NDim+1), 1> result = scatteringIntegrationTypeB<NDim, Nlegs>(D, N, commonLinForm0, commonLinForm1, outputformsLinForm, nMCpoints).eval();
     result *= fullAmplitude;
     // Returns only the rate for the selected particle
-    rates[legBandNumber[which]].elementVec(elemID[which]) += legDirection[i] * result.template block<NDim+1,1>(which*(NDim+1),0) ;
+    rates[legBandNumber[which]].elementVec(elemID[which]) -= legDirection[i] * result.template block<NDim+1,1>(which*(NDim+1),0) ;
     
 };
 
