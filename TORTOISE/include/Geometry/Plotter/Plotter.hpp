@@ -81,6 +81,7 @@
 #define Plotter_hpp
 
 #include <Geometry/GeometryCore/Geometry.hpp>
+
 #include <Configuration>
 
 #include <cassert>
@@ -117,6 +118,7 @@ class TEXT {
 };
 class ASPOINTS { public: const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> vertices; template <typename Derived>ASPOINTS(const Eigen::MatrixBase<Derived>& t_vertices): vertices(t_vertices){}};
 class ARROW{public: const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> arrow; const Real thickness; template <typename Derived>ARROW(const Eigen::MatrixBase<Derived>& t_arrow, const Real t_thickness): arrow(t_arrow), thickness(t_thickness){}};
+class RANGE {public: const Point<2> plotLimits; template <typename Derived> RANGE(const Eigen::MatrixBase<Derived>& MinMax): plotLimits(MinMax){}; EIGEN_MAKE_ALIGNED_OPERATOR_NEW  };
 
 
 class Plotter3D {
@@ -127,7 +129,7 @@ public:
     int                 numberplots = 0;
     int                 numberobjects = 0;
 
-    std::string         gnuplotcommand;
+    const std::string   gnuplotcommand;
     const bool          interactive;
     bool                polygonModeActive = false;
 
@@ -138,7 +140,7 @@ private:
 
 public:
 
-    Plotter3D(const std::string& t_Gnuplotcommand = DEFAULTGNUPLOTCOMMAND, bool t_interactive=true);
+    Plotter3D(const std::string& t_Gnuplotcommand = DEFAULTGNUPLOTCOMMAND, bool t_interactive = true);
     
     ~Plotter3D();
     
@@ -236,6 +238,7 @@ public:
     Plotter2D& operator << (GNUPLOTCOMMAND command);
     Plotter2D& operator << (ASPOINTS points);
     Plotter2D& operator << (ARROW arrow);
+    Plotter2D& operator << (RANGE plotRange);
     
     template <typename Derived> Plotter2D& operator << (const Eigen::MatrixBase<Derived>& vertices){
         if( vertices.rows() == 1){

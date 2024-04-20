@@ -56,13 +56,13 @@ template<int NDim> class MaterialStatus :
 // for (auto i : materialstatus.matchListIndex("electr*")) { materialstatus[i];}
 // or
 // for (auto i : materialstatus.matchList("electr*")) { *i;}
-    public StringMap<Function<NDim>>,   // It contains the populations
+public Containers::StringMap<Function<NDim>>,   // It contains the populations
 
 // Math field operations are defined (+,-,*,/).
 // The same operations are defined with scalars.
 // This inheritance constructs all the possible combinations of operators
-    public MathFieldSpace<MaterialStatus<NDim>> ,   // Inherits all the operations of a field from MathFieldSpace and AsymmetricMathFieldSpace
-    public AsymmetricMathFieldSpaceByValue<MaterialStatus<NDim>,Real>
+public Tortoise::Features::MathFieldSpace<MaterialStatus<NDim>> ,   // Inherits all the operations of a field from MathFieldSpace and AsymmetricMathFieldSpace
+public Tortoise::Features::AsymmetricMathFieldSpaceByValue<MaterialStatus<NDim>,Real>
 {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,7 +70,7 @@ template<int NDim> class MaterialStatus :
 //~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~
 public:
-    const Material<NDim> *          material;       // Pointer to the material the populations refer to
+    Material<NDim> * const          material;       // Pointer to the material the populations refer to
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,8 +81,8 @@ public:
     //=======================================================
     // Constructors
     //===================
-    explicit MaterialStatus(const Material<NDim> &t_material);          // Initialises all the populations to zero
-    explicit MaterialStatus(const Material<NDim>* t_material);          // Initialises all the populations to zero
+    explicit MaterialStatus(Material<NDim> &t_material);          // Initialises all the populations to zero
+    explicit MaterialStatus(Material<NDim>* const t_material);          // Initialises all the populations to zero
     MaterialStatus(const MaterialStatus<NDim> &other);                  // Copy constructor
     MaterialStatus(MaterialStatus<NDim>&& other);                       // Move constructor
     
@@ -112,12 +112,18 @@ public:
     //********************************
     // Propagations
     //********************************
-    MaterialStatus propagateDeterministic() const;
-    MaterialStatus scatteringRatesDeterministic() const;
+    MaterialStatus propagate() const;
+    MaterialStatus scatteringRates() const;
     
     Real           relativeError(const MaterialStatus<NDim>& population) const;         // Assumes that the object is the error and the population at the next time step is passed
     
     MaterialStatus applyConstraints(Real time) const;
+    
+    //********************************
+    // Utilities
+    //********************************
+    void setToEquilibrium(Real temperature, Real chemicalPotentialFermions, Real chemicalPotentialBosons); 
+                                                                     
     
     //********************************
     //* I/O

@@ -42,6 +42,8 @@
     
 namespace Tortoise {
 
+namespace Utilities {
+
 class Clock {
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> start, finish;
@@ -58,6 +60,8 @@ public:
 };
     
 extern Clock stopWatch;
+
+} // namespace Utilities 
 
 } // namespace Tortoise
 

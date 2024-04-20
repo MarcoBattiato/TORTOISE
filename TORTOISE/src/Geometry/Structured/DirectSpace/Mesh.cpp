@@ -40,6 +40,9 @@
 #include <cassert>
 #include <fstream>
 
+using Tortoise::Utilities::randGen;
+using namespace Tortoise::GeometryCore;
+
 namespace Tortoise {
 
 // Output for EigenMatrix types
@@ -262,7 +265,7 @@ template<> VecOfDataVector calculate_verticesCoord<3>(const Point<3>& t_OriginCo
 }
 
 // Constructor
-template<int NDim> Mesh<NDim>::Mesh(const Region<NDim>& t_region, const Point<NDim>& t_OriginCoord, const Point<NDim>& t_gVecfrac, const CartIndex<NDim>& t_nSecSplits):
+template<int NDim> Mesh<NDim>::Mesh(Region<NDim> const & t_region, const Point<NDim>& t_OriginCoord, const Point<NDim>& t_gVecfrac, const CartIndex<NDim>& t_nSecSplits):
     region(&t_region),
     origin(t_region.origin+t_region.gVec * t_OriginCoord),
     gVec(t_region.gVec * t_gVecfrac.asDiagonal()),
@@ -290,7 +293,7 @@ template<int NDim> Mesh<NDim>::Mesh(const Region<NDim>& t_region, const Point<ND
 };
 
 
-template<int NDim> Mesh<NDim>::Mesh(const Region<NDim>& t_region, const Real t_relativeOrigin, const Real t_relativegVec, const int t_nSecSplits) requires (NDim == 1) :
+template<int NDim> Mesh<NDim>::Mesh(Region<NDim> const & t_region, const Real t_relativeOrigin, const Real t_relativegVec, const int t_nSecSplits) requires (NDim == 1) :
     region(&t_region) ,
     origin(t_region.origin + t_region.gVec * Point<NDim>::Constant(t_relativeOrigin) ) ,
     gVec(t_region.gVec * Point<NDim>::Constant(t_relativegVec).asDiagonal()) ,
@@ -538,6 +541,26 @@ template<int NDim> Point<NDim> Mesh<NDim>::elemCentre(const MeshElementIterator<
 }
 template<int NDim> Point<NDim> Mesh<NDim>::elemCentre(const MeshSubsetElementIterator<NDim>& t_elementID) const {
     return elemCentre(t_elementID.currentElementID);
+}
+
+//=======================================================
+// Associated Meshes
+//===================
+template<> Mesh<1> Mesh<1>::convolutionMesh() const {
+    Real  halfSizeConvMesh;
+    if (((relativegVec(0, 0) > 0) && (region->gVec(0) < 0)) || ((relativegVec(0, 0) < 0) && (region->gVec(0) > 0))) { halfSizeConvMesh = -(gVec(0, 0)); }
+    else { halfSizeConvMesh = (gVec(0, 0)); }
+    
+    int numberOfElemConvMesh        = 2 * numberElements;
+    return Mesh<1>( region, Point<1>((- halfSizeConvMesh - region->origin(0))/region->gVec(0)), Point<1>(2.0*halfSizeConvMesh/region->gVec(0)), CartIndex<1>(numberOfElemConvMesh));
+}
+template<> Mesh<2> Mesh<2>::convolutionMesh() const {
+    assert(false && "Function<2>::convolutionMesh not implemented");
+    return *(this);
+}
+template<> Mesh<3> Mesh<3>::convolutionMesh() const {
+    assert(false && "Function<3>::convolutionMesh not implemented");
+    return *(this);
 }
 
 //=======================================================

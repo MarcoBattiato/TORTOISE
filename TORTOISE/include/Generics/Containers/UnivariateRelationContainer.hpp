@@ -48,6 +48,8 @@
 
 namespace Tortoise {
 
+namespace Containers {
+
 template <class containerArg , class containerVal> class UnivariateRelationContainer {
 
     //=======================================================
@@ -127,6 +129,8 @@ public:
     UnivariateRelationContainer&     emplace_back(const ArgType& x, const ValType& y) {argVec.emplace_back(x); valVec.emplace_back(y); return *this;};
     
 };
+
+} // namespace Containers
 
 } // namespace Tortoise
 

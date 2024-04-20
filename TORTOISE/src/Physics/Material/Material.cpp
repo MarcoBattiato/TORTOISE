@@ -36,6 +36,7 @@
 
 #include <Physics/Material/Material.hpp>
 #include <Generics/Utilities/StringUtilities.hpp>
+#include "Geometry/AnalyticExpressions/AnalyticFunction.hpp"
 
 #include <cassert>
 #include <algorithm>
@@ -50,17 +51,20 @@ template<int NDim> Material<NDim>::Material(const std::string &t_id, const Regio
 //=======================================================
 // Material construction: Bands
 //===================
-template<int NDim> void Material<NDim>::addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Function<NDim>& t_dispersion){
+template<int NDim> Band<NDim>& Material<NDim>::addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Function<NDim>& t_dispersion){
     assert(t_dispersion.mesh->region == region);    // Makes sure the band is defined onto the same region
     this->emplace_back(t_id, Band<NDim>(t_charge, t_statistics, t_dispersion));
+    return (*this)[t_id];
 }
-template<int NDim> void Material<NDim>::addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const std::function<Real(Point<NDim>)>& t_dispersion) {
+template<int NDim> Band<NDim>& Material<NDim>::addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const std::function<Real(Point<NDim>)>& t_dispersion) {
     assert(t_mesh.region == region);    // Makes sure the band is defined onto the same region
     this->emplace_back(t_id, Band<NDim>(t_charge, t_statistics, t_mesh, t_dispersion));
+    return (*this)[t_id];
 }
-template<int NDim> void Material<NDim>::addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const Real t_dispersion) {
+template<int NDim> Band<NDim>& Material<NDim>::addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const Real t_dispersion) {
     assert(t_mesh.region == region);    // Makes sure the band is defined onto the same region
     this->emplace_back(t_id, Band<NDim>(t_charge, t_statistics, t_mesh, t_dispersion));
+    return (*this)[t_id];
 }
 
 //=======================================================
@@ -222,8 +226,13 @@ template<> template<> std::vector<ScatteringChannel<_NDIM_,2>*> Material<_NDIM_>
             scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].minimumDeterminant = defaultMinimumDeterminantScatterings;                                        \
             scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].scattElemeThreshold = defaultScattElemeThresholdScatterings;                                      \
             scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].findUmklappVectors(numUmklappSteps);                                                              \
-            int nScattElem = scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].countScatteringElementIDs();                                                     \
-            if (nScattElem == 0 ) { scatteringChannelsList2Legs.pop_back();}  /* If there are no allowed scatterings in the channel, we remove it */                            \
+            scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].constructMCPoints();                                                                              \
+            scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].precalculateIndices();                                                                            \
+            if (scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].scatteringMatrixIndices.size() == 0 ) {                                                       \
+                scatteringChannelsList2Legs.pop_back();                                                                                                                         \
+            } else { scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].numberScatteringElements =                                                               \
+                scatteringChannelsList2Legs[scatteringChannelsList2Legs.size()-1].scatteringMatrixIndices.size();                                                               \
+            }                                                                                                                                                                   \
         }                                                                                                                                                                       \
     }                                                                                                                                                                           \
     return scatteringChannelMatchList<2>(bandsNames, t_legDirection);                                                                                                           \
@@ -275,8 +284,13 @@ template<> template<> std::vector<ScatteringChannel<_NDIM_,3>*> Material<_NDIM_>
                 scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].minimumDeterminant = defaultMinimumDeterminantScatterings;                                    \
                 scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].scattElemeThreshold = defaultScattElemeThresholdScatterings;                                  \
                 scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].findUmklappVectors(numUmklappSteps);                                                          \
-                int nScattElem = scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].countScatteringElementIDs();                                                 \
-                if (nScattElem == 0 ) { scatteringChannelsList3Legs.pop_back();}  /* If there are no allowed scatterings in the channel, we remove it */                        \
+                scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].constructMCPoints();                                                                          \
+                scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].precalculateIndices();                                                                        \
+                if (scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].scatteringMatrixIndices.size() == 0 ) {                                                   \
+                    scatteringChannelsList3Legs.pop_back();                                                                                                                     \
+                } else { scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].numberScatteringElements =                                                           \
+                    scatteringChannelsList3Legs[scatteringChannelsList3Legs.size()-1].scatteringMatrixIndices.size();                                                           \
+                }                                                                                                                                                               \
             }                                                                                                                                                                   \
         }                                                                                                                                                                       \
     }                                                                                                                                                                           \
@@ -335,8 +349,13 @@ template<> template<> std::vector<ScatteringChannel<_NDIM_,4>*> Material<_NDIM_>
                     scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].minimumDeterminant = defaultMinimumDeterminantScatterings;                                \
                     scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].scattElemeThreshold = defaultScattElemeThresholdScatterings;                              \
                     scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].findUmklappVectors(numUmklappSteps);                                                      \
-                    int nScattElem = scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].countScatteringElementIDs();                                             \
-                    if (nScattElem == 0 ) { scatteringChannelsList4Legs.pop_back();}  /* If there are no allowed scatterings in the channel, we remove it */                    \
+                    scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].constructMCPoints();                                                                      \
+                    scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].precalculateIndices();                                                                    \
+                    if (scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].scatteringMatrixIndices.size() == 0 ) {                                               \
+                        scatteringChannelsList4Legs.pop_back();                                                                                                                 \
+                    } else { scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].numberScatteringElements =                                                       \
+                        scatteringChannelsList4Legs[scatteringChannelsList4Legs.size()-1].scatteringMatrixIndices.size();                                                       \
+                    }                                                                                                                                                           \
                 }                                                                                                                                                               \
             }                                                                                                                                                                   \
         }                                                                                                                                                                       \
@@ -348,13 +367,66 @@ CONSTRUCT_ADDSCATTERINGCHANNELSWILDCARDS4LEGS(2)
 CONSTRUCT_ADDSCATTERINGCHANNELSWILDCARDS4LEGS(3)
 
 
+
+
+
+//=======================================================
+// Scattering Initialisation
+//===================
+
+template <int NDim> void Material<NDim>::constructMCPoints(){
+    for (int i=0; i<scatteringChannelsList2Legs.size(); ++i){
+        if (scatteringChannelsList2Legs[i].amplitude != 0.)
+            scatteringChannelsList2Legs[i].constructMCPoints();
+    }
+    for (int i=0; i<scatteringChannelsList3Legs.size(); ++i){
+        if (scatteringChannelsList3Legs[i].amplitude != 0.)
+            scatteringChannelsList3Legs[i].constructMCPoints();
+    }
+    for (int i=0; i<scatteringChannelsList4Legs.size(); ++i){
+        if (scatteringChannelsList4Legs[i].amplitude != 0.)
+            scatteringChannelsList4Legs[i].constructMCPoints();
+    }
+}
+
+//=======================================================
+// Material Analysis
+//===================
+
 template <int NDim> template<int NLegs> Function<NDim> Material<NDim>::scatteringRates(const std::array<std::string, NLegs>& bandsNamesWildCards, const std::array<scattLegDirection, NLegs>& t_legDirection, const MaterialStatus<NDim>& status, const std::string& bandName) {
     Function<NDim> toReturn((*this)[bandName].mesh);
     for (auto scatt : scatteringChannelMatchList<NLegs>(bandsNamesWildCards, t_legDirection)){
-        toReturn += scatt->scatteringRatesDeterministic(status, bandName);
+        toReturn += scatt->scatteringRates(status, bandName);
         }
     return toReturn;
 };
+
+template <int NDim> template<int NLegs> Function<NDim> Material<NDim>::selectivePropagation(const std::array<std::string, NLegs>& bandsNamesWildCards, const std::array<scattLegDirection, NLegs>& t_legDirection, const MaterialStatus<NDim>& status, const std::string& bandName) {
+    MaterialStatus<NDim> toReturn(status.material);
+    for (auto scatt : scatteringChannelMatchList<NLegs>(bandsNamesWildCards, t_legDirection)){
+        toReturn += scatt->propagate(status);
+        }
+    return toReturn[bandName];
+};
+
+//=======================================================
+// Utilities
+//===================
+template <int NDim> Mesh<NDim> Material<NDim>::photonMesh(int resolution) const{
+    Eigen::Matrix<Real,NDim,NDim> invGV = region->gVec.inverse();
+    Point<NDim> photonMeshRelativeSizes = Point<NDim>::Constant(1.e-5);
+    photonMeshRelativeSizes(0) = 1.e-4;
+    CartIndex<NDim> photonMeshResolutions = CartIndex<NDim>::Constant(1);
+    photonMeshResolutions(0) = resolution;
+    return Mesh<NDim>(region, -invGV * region->origin,photonMeshRelativeSizes,photonMeshResolutions);
+}
+
+template <int NDim> void Material<NDim>::addPhotonBand(const std::string &t_id, Mesh<NDim> const& photonMesh, Real lowestEnergy, Real highestEnergy){
+    using Tortoise::AnalyticExpression::k;
+    Eigen::Matrix<Real,NDim,NDim> invGV = region->gVec.inverse();
+    addBand(t_id, 0., boson, photonMesh, (highestEnergy-lowestEnergy)* dot( invGV.row(0), k)/photonMesh.relativegVec(0) + lowestEnergy);
+}
+
 
 //=======================================================
 // I/O
@@ -402,6 +474,32 @@ template<> void Material<2>::plot(const std::vector<std::string> &bandstoplot) c
     }
     plotter3d << PLOT;
 };
+template<> void Material<2>::spaghettiPlot(const std::vector<std::string>& bandstoplot) const {
+    Real shift = 0;
+    for ( int series = 0, end = seriesSpaghettiPoints.size(); series < end; ++series){
+        int c = 0;
+        for (auto band : bandstoplot){
+            if ( c++ == 0 ){
+                plotter2d << ProjectedShifted<2>((*this)[band].dispersion, shift, seriesSpaghettiPoints[series], seriesSpaghettiPointsNames[series]);
+                if (series == 0) plotter2d << LABEL(band);
+                else plotter2d << NOLABEL;
+            } else {
+                plotter2d << ProjectedShifted<2>((*this)[band].dispersion, shift, seriesSpaghettiPoints[series]);
+                if (series == 0) plotter2d << LABEL(band);
+                else plotter2d << NOLABEL;
+            }
+        }
+        for (int i = 1, end = seriesSpaghettiPoints[series].cols(); i < end; ++i)
+            shift += (seriesSpaghettiPoints[series].col(i) - seriesSpaghettiPoints[series].col(i-1)).norm();
+    }
+    plotter2d<< PLOT;
+}
+template<> void Material<2>::spaghettiPlot(std::string const & bandstoplotWildcards) const {
+    spaghettiPlot(matchListId(bandstoplotWildcards));
+}
+template<> void Material<2>::spaghettiPlot() const {
+    spaghettiPlot("*");
+}
 
 template<int NDim> std::ostream &operator<<(std::ostream &os, Material<NDim> const& material){
     os <<  "********************************************\n";
@@ -449,6 +547,8 @@ template std::string Material<_NDIM_>::scatteringName<_NLEGS_>                  
 template std::string Material<_NDIM_>::scatteringName<_NLEGS_>                                                                                  \
  (const std::array<std::string, _NLEGS_>& bandsNames, const std::array<scattLegDirection, _NLEGS_>& t_legDirection) const;                      \
 template Function<_NDIM_> Material<_NDIM_>::scatteringRates<_NLEGS_>                                                                            \
+ (const std::array<std::string, _NLEGS_>&, const std::array<scattLegDirection, _NLEGS_>&, const MaterialStatus<_NDIM_>&, const std::string&);   \
+template Function<_NDIM_> Material<_NDIM_>::selectivePropagation<_NLEGS_>                                                                       \
  (const std::array<std::string, _NLEGS_>&, const std::array<scattLegDirection, _NLEGS_>&, const MaterialStatus<_NDIM_>&, const std::string&);
 EXPLICIT_TEMPLATE_INSTANTIATION_MATERIAL_METHODS_TEMPLATES(1,2)
 EXPLICIT_TEMPLATE_INSTANTIATION_MATERIAL_METHODS_TEMPLATES(1,3)

@@ -89,28 +89,29 @@ using namespace Tortoise;
 
 #include <iostream>
 using std::cout;
+using Tortoise::AnalyticExpression::x, Tortoise::AnalyticExpression::y, Tortoise::AnalyticExpression::z;
 
 int main(int argc, const char * argv[]) {
     
     // First we learn few fundamental functionalities offered by "Geometry.hpp"
     
     // ************************************************************
-    // The type alias: real (Geometry.hpp)
+    // The type alias: Real (Geometry.hpp)
     // ************************************************************
 
     // The whole library is built in a way that it is easy to change the precision of the used real numbers.
     // Instead of explicitly using float or double, etc, the user should use the type alias: real
-    // In the version this tutorial was written for, real = double
+    // In the version this tutorial was written for, Real = double
     // However in a later version the precision might be decreased or increased.
 
     // Do not use
     // double myValue = 1.35;
     // Use instead
-    real myValue = 1.35;
+    Real myValue = 1.35;
 
     // This will ensure that all the numbers within TORTOISE have the same precision
     
-    // If for whatever reason you want to change the type aliased by real
+    // If for whatever reason you want to change the type aliased by Real
     // modify file Geometry/GeometryCore/Geometry.hpp  line 111
     // Notice that this change will automatically propagate everywhere in TORTOISE.
     // This is a very convenient way of changing precision everywhere by changing a single line.
@@ -264,7 +265,7 @@ int main(int argc, const char * argv[]) {
     // -> origin of the mesh as fraction of the region
     // -> sides of the mesh as fraction of the region's sides
     // -> splits per side
-    Mesh<2> mesh(region, Point<2>({0.1,0.2}), Point<2>({0.6,0.5}),CartIndex<2>({4,3}));
+    Mesh<2> mesh(region, Point<2>({0.1,0.2}), Point<2>({0.6,0.5}), CartIndex<2>({4,3}));
     mesh.plot("Example 2.1: Mesh plot");
     // Similarly to regions, meshes can be directly sent to plotter3d for a higher personalisation of the plot
     // Have a look at how the method plot and the << operator are implemented in Mesh.cpp
@@ -310,18 +311,18 @@ int main(int argc, const char * argv[]) {
     // There are more advanced constructor
     
     // This construct a new discretised function as the result of some expression of another discretised function
-    Function<2> funct4([](real z){return 1./z;}, funct2);
+    Function<2> funct4([](Real z){return 1./z;}, funct2);
     // Notice how it is not necessary to pass a mesh, since this constructor creates a function object on the same
     // mesh of funct2, and initialises it to 1/funct2(x,y)
     
     // As a function of more variables
-    Function<2> funct5([](std::vector<real> z){return 1./z[0] + 3.*z[0]*z[1];}, {funct2, funct3});
+    Function<2> funct5([](std::vector<Real> z){return 1./z[0] + 3.*z[0]*z[1];}, {funct2, funct3});
     // Creates a function object on the same mesh of funct2, and initialises it to 1/funct2(x,y) + funct2(x,y) * funct3(x,y)
     // Notice that if funct2 and funct3 are defined on different meshes, the constructor will return a runtime error if debug
     // mode is active
     
     // Of course the usual copy constructor is provided
-    Function<2> funct6(funct3);    // Makes a new function, copying funct4
+    Function<2> funct6(funct3);    // Makes a new function, copying funct3
     
     //======================
     // Evaluation

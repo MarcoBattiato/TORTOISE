@@ -49,9 +49,9 @@ template <int NDim> class TrapezoidalSubset;
 
 template <int NDim> class MeshSubset {
 public:
-    const Mesh<NDim>*       mesh;
-    CartIndex<NDim>         lSecCoord;   // First included section coordinates
-    CartIndex<NDim>         hSecCoord;   // First excluded section coordinates
+    Mesh<NDim> const * const        mesh;
+    CartIndex<NDim>                 lSecCoord;   // First included section coordinates
+    CartIndex<NDim>                 hSecCoord;   // First excluded section coordinates
     
 public:
     //=======================================================
@@ -156,7 +156,7 @@ Plotter3D& operator << (Plotter3D& plotter, const TrapezoidalSubset<2>& t_subset
 //===================
 // Square subset within the unit square
 // This will be used as all the subsets within the region will be treated in relative coordinates
-template <int NDim> class TrapezoidalSubset : public VectorSpace<TrapezoidalSubset<NDim>,Real>, AsymmetricVectorSpace<TrapezoidalSubset<NDim>, Point<NDim>> {
+template <int NDim> class TrapezoidalSubset : public Features::VectorSpace<TrapezoidalSubset<NDim>,Real>, Features::AsymmetricVectorSpace<TrapezoidalSubset<NDim>, Point<NDim>> {
 public:
     Point<NDim>    lcoord, hcoord;
 public:

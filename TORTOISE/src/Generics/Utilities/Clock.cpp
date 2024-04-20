@@ -38,7 +38,11 @@
 
 namespace Tortoise {
 
-Clock stopWatch=Clock();
+namespace Utilities {
+
+Utilities::Clock stopWatch = Utilities::Clock();
+
+} // namespace Utilities
 
 } // namespace Tortoise
 

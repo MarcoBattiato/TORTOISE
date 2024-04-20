@@ -347,8 +347,12 @@ Plotter2D& Plotter2D::operator << (ARROW arrow) {
     plotFormat += " set arrow from "+ std::to_string(arrow.arrow(0,0)) + ", "+ std::to_string(arrow.arrow(1,0)) + " to " + std::to_string(arrow.arrow(0,1)) + ", " + std::to_string(arrow.arrow(1,1)) + " lw " + std::to_string(arrow.thickness) + "\n";
     return *this;
 }
+Plotter2D& Plotter2D::operator << (RANGE plotRange){
+// Author: Indrajit Wadgaonkar
+    plotFormat += "set yrange ["+ std::to_string(plotRange.plotLimits(0))+":" + std::to_string(plotRange.plotLimits(1))+"]\n";
+    return *this;
+}
 
 Plotter2D plotter2d = Plotter2D();
-
 
 } // namespace Tortoise

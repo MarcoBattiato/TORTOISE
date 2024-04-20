@@ -40,5 +40,6 @@
 #include "Generics/Utilities/StringUtilities.hpp"
 #include "Generics/Utilities/Clock.hpp"
 #include "Generics/Utilities/RandomNGenerator.hpp"
+#include "Generics/Utilities/UsefulMathFunctions.hpp"
 
 #endif /* MiscUtilities_hpp */

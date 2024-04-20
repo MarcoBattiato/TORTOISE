@@ -41,6 +41,11 @@
 
 #include <deque>
 #include <fstream>
+#include <tbb/parallel_for.h>
+#include <tbb/parallel_reduce.h>
+
+using namespace Tortoise::GeometryCore;
+using namespace Tortoise::PhysicsCore;
 
 namespace Tortoise {
 
@@ -136,22 +141,22 @@ template<int NDim, int Nlegs> VectorPoint<NDim> standardUmklappVectors (const st
 };
 
 template<int NDim, int Nlegs> ScatteringChannel<NDim,Nlegs>::ScatteringChannel(const Material<NDim>& t_material, const std::array<int, Nlegs>& bandsNumbers, const std::array<scattLegDirection, Nlegs>& t_legDirection): material(&t_material), legBand(assignlegBand<NDim,Nlegs>(t_material,bandsNumbers)), legDirection(t_legDirection), legBandNumber(bandsNumbers), modalOrdersCombinations(produceModalOrdersCombinations<NDim,Nlegs>()),
-//functAmplitude([](const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>)->Real{return 1.;}),
+functAmplitude([](const ArrayPoint<NDim, Nlegs>&)->Real{return 1.;}),
 //functAmplitude([](const std::array<Point<NDim>,Nlegs>&)->Real{return 1.;}),
-functAmplitude([](const std::vector<MeshSubsetElementIterator<NDim>>&)->Real{return 1.;}),
+//functAmplitude([](const std::vector<MeshSubsetElementIterator<NDim>>&)->Real{return 1.;}),
 umklappUnitVectors(standardUmklappVectors<NDim,Nlegs>(t_legDirection)) {};
 
 template<int NDim, int Nlegs> ScatteringChannel<NDim,Nlegs>::ScatteringChannel(const Material<NDim>& t_material, const std::array<std::string, Nlegs>& bandsNames, const std::array<scattLegDirection, Nlegs>& t_legDirection) : material(&t_material), legBand(assignlegBand<NDim,Nlegs>(t_material,bandsNames)), legDirection(t_legDirection), legBandNumber(assignlegBandNumber<NDim,Nlegs>(t_material,bandsNames)), modalOrdersCombinations(produceModalOrdersCombinations<NDim,Nlegs>()),
-//functAmplitude([](const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>)->Real{return 1.;}),
+functAmplitude([](const ArrayPoint<NDim, Nlegs>&)->Real{return 1.;}),
 //functAmplitude([](const std::array<Point<NDim>,Nlegs>&)->Real{return 1.;}),
-functAmplitude([](const std::vector<MeshSubsetElementIterator<NDim>>&)->Real{return 1.;}),
+//functAmplitude([](const std::vector<MeshSubsetElementIterator<NDim>>&)->Real{return 1.;}),
 umklappUnitVectors(standardUmklappVectors<NDim,Nlegs>(t_legDirection)) {};
  
 template<int NDim> VectorPoint<NDim> buildTestUmklappVects(const int nNearestBrillouinZones, const Material<NDim>& material); // Generates all umklapp vectors (including no umklapp) up to the chosen number of nearest brillouin zones
 
 template<> VectorPoint<1> buildTestUmklappVects<1>(const int nNearestBrillouinZones, const Material<1>& material){
     VectorPoint<1> toreturn;
-    const int numberTestUmklappVects = IntPower<1>(2*nNearestBrillouinZones+1);
+    const int numberTestUmklappVects = Utilities::intPower<1>(2*nNearestBrillouinZones+1);
     toreturn.resize(Eigen::NoChange, numberTestUmklappVects);
     int counter = 0;
     for (int i= - nNearestBrillouinZones; i <= nNearestBrillouinZones; ++i){
@@ -161,7 +166,7 @@ template<> VectorPoint<1> buildTestUmklappVects<1>(const int nNearestBrillouinZo
 }
 template<> VectorPoint<2> buildTestUmklappVects<2>(const int nNearestBrillouinZones, const Material<2>& material){
     VectorPoint<2> toreturn;
-    const int numberTestUmklappVects = IntPower<2>(2*nNearestBrillouinZones+1);
+    const int numberTestUmklappVects = Utilities::intPower<2>(2*nNearestBrillouinZones+1);
     toreturn.resize(Eigen::NoChange, numberTestUmklappVects);
     int counter = 0;
     for (int i= - nNearestBrillouinZones; i <= nNearestBrillouinZones; ++i){
@@ -173,7 +178,7 @@ template<> VectorPoint<2> buildTestUmklappVects<2>(const int nNearestBrillouinZo
 }
 template<> VectorPoint<3> buildTestUmklappVects<3>(const int nNearestBrillouinZones, const Material<3>& material){
     VectorPoint<3> toreturn;
-    const int numberTestUmklappVects = IntPower<3>(2*nNearestBrillouinZones+1);
+    const int numberTestUmklappVects = Utilities::intPower<3>(2*nNearestBrillouinZones+1);
     toreturn.resize(Eigen::NoChange, numberTestUmklappVects);
     int counter = 0;
     for (int i= - nNearestBrillouinZones; i <= nNearestBrillouinZones; ++i){
@@ -197,13 +202,13 @@ template<int NDim, int Nlegs> bool ScatteringChannel<NDim,Nlegs>::findUmklappVec
     for (int i=0; i<testUmklappVects.cols(); ++i) {
                     
         // Calculate the number of allowed combinations for the test umklapp vector
-        int nScattElem = countScatteringElementIDsSingleUmklapp(testUmklappVects.col(i));
+//        int nScattElem = countScatteringElementIDsSingleUmklapp(testUmklappVects.col(i));
                     
-        if (nScattElem > 0 ) { // If there are allowed combinations, we add the vector
+//        if (nScattElem > 0 ) { // If there are allowed combinations, we add the vector
             umklappVects.conservativeResize(Eigen::NoChange, umklappVects.cols()+1);
             umklappVects.col(umklappVects.cols()-1) = testUmklappVects.col(i);
-            numberScatteringElements += nScattElem;
-        }
+//            numberScatteringElements += nScattElem;
+//        }
     }
     umklappUnitVectors = umklappVects;
     return (umklappUnitVectors.cols() != 0 );
@@ -267,35 +272,6 @@ template<int NDim, int NLegs> Function<NDim> ScatteringChannel<NDim,NLegs>::scat
     return nScattNumb;
 }
 
-// Stochastic
-template<int NDim, int NLegs> unsigned long ScatteringChannel<NDim,NLegs>::countScatteringElementIDsStochastic(const int nMCpointsOuter) const{
-    int toreturn = 0;
-    int nUmklVecs = umklappUnitVectors.cols();
-    for (int i=0; i<nUmklVecs; ++i){
-        stochasticIteration(umklappUnitVectors.col(i), nMCpointsOuter,[&toreturn](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){++toreturn;},[](){});
-    }
-    return toreturn;
-}
-template<int NDim, int NLegs> std::vector<std::array<int,NLegs>> ScatteringChannel<NDim,NLegs>::scatteringElementIDsStochastic(const int nMCpointsOuter) const {
-    std::vector<std::array<int,NLegs>> toreturn;
-    int nUmklVecs = umklappUnitVectors.cols();
-    for (int i=0; i<nUmklVecs; ++i){
-        stochasticIteration(umklappUnitVectors.col(i), nMCpointsOuter,
-         [&toreturn](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
-            std::array<int,NLegs> indexList;
-            for (int i=0; i<NLegs; ++i){indexList[i] = elemID[i].currentElementID;}
-            toreturn.emplace_back(indexList);
-        },
-         [](){});
-    }
-    return toreturn;
-}
-template<int NDim, int NLegs> Function<NDim> ScatteringChannel<NDim,NLegs>::scatteringPerElementStochasticPlot(const int which, const int nMCPoints) const{
-    auto elemIds = this->scatteringElementIDsStochastic(nMCPoints);
-    Function<NDim> nScattNumb (this->legBand[which]->mesh);
-    for (int i = 0; i<elemIds.size(); ++i) { nScattNumb += FunctionElement<NDim>(this->legBand[which]->mesh,elemIds[i][which],1.0);}
-    return nScattNumb;
-}
 
 //=======================================================
 // Scattering Integrators setup
@@ -323,9 +299,42 @@ template<int NDim, int Nlegs> auto constructD(const ScatteringChannel<NDim,Nlegs
     }
     return D;
 }
+template<int NDim, int Nlegs> auto constructD(const ScatteringChannel<NDim,Nlegs>& scattChan, const std::array<int,Nlegs>& elemID){
+    // Construction of D
+    //         leg 0     leg 1     ...   leg NLEGS-1
+    //      [         |          |      |           ]    signed momentum conservation dim 0
+    //      [         |          |      |           ]        ...
+    // D =  [         |          |      |           ]    signe momentum conservation dim NDIMS - 1
+    //      [ --------+----------+------+---------- ]
+    //      [         |          |      |           ]    signed energy conservation
+    Eigen::Matrix<Real, NDim+1,Nlegs*NDim> D;
+    for (int leg=0; leg<Nlegs; ++leg) {
+        for (int dim=0; dim<NDim; ++dim){
+            D.template block<1,NDim>(dim,leg*NDim) = scattChan.legDirection[leg] * scattChan.legBand[leg]->crystalMomentum[dim].elementVec(elemID[leg]).template block<1,NDim>(0,1);
+        }
+        D.template block<1,NDim>(NDim,leg*NDim) = scattChan.legDirection[leg] * scattChan.legBand[leg]->dispersion.elementVec(elemID[leg]).template block<1,NDim>(0,1);
+    }
+    return D;
+}
 
 // Constructs the N vector
 template<int NDim, int Nlegs> auto constructN(const ScatteringChannel<NDim,Nlegs>& scattChan, const Point<NDim>& umklappVect, const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
+    Eigen::Matrix<Real, NDim+1, 1> N( Eigen::Matrix<Real, NDim+1, 1>::Zero());
+    for (int leg=0; leg<Nlegs; ++leg) {
+        for (int dim=0; dim<NDim; ++dim){
+            N(dim,0) -= scattChan.legDirection[leg] * scattChan.legBand[leg]->crystalMomentum[dim].elementVec(elemID[leg])(0);
+        }
+        N(NDim,0) -= scattChan.legDirection[leg] * scattChan.legBand[leg]->dispersion.elementVec(elemID[leg])(0);
+    }
+    
+    for (int dim=0; dim<NDim; ++dim){
+        for (int dimumkl=0; dimumkl<NDim; ++dimumkl){
+            N(dim,0)-= umklappVect(dimumkl) * scattChan.material->region->gVec(dim,dimumkl);
+        }
+    }
+    return N;
+}
+template<int NDim, int Nlegs> auto constructN(const ScatteringChannel<NDim,Nlegs>& scattChan, const Point<NDim>& umklappVect, const std::array<int,Nlegs>& elemID){
     Eigen::Matrix<Real, NDim+1, 1> N( Eigen::Matrix<Real, NDim+1, 1>::Zero());
     for (int leg=0; leg<Nlegs; ++leg) {
         for (int dim=0; dim<NDim; ++dim){
@@ -375,40 +384,97 @@ template<int NDim, int Nlegs> Real constructAmplitude(const ScatteringChannel<ND
     Real fullAmplitude = scattChan.amplitude;
     //  -> Ratio between the actual integration volume and the integration over the reference elements
     for (int leg=0; leg<Nlegs; ++leg) {
-        fullAmplitude *= scattChan.legBand[leg]->mesh->elemVolume * static_cast<double>(factorial(NDim)) ;
+        fullAmplitude *= scattChan.legBand[leg]->mesh->elemVolume * static_cast<double>(Utilities::factorial(NDim)) ;
     }
     //  -> Evaluation of a scattering element amplitude at the baricentres of the elements
-//    ArrayPoint<NDim, Nlegs> baricentres;
-//    for (int i=0; i<Nlegs; ++i ){ baricentres.col(i) =  scattChan.legBand[i]->mesh->elemCentre(elemID[i]);}
+    ArrayPoint<NDim, Nlegs> baricentres;
+    for (int i=0; i<Nlegs; ++i ){ baricentres.col(i) =  scattChan.legBand[i]->mesh->elemCentre(elemID[i]);}
 //    std::array<Point<NDim>,Nlegs> baricentres;
 //    for (int i=0; i<Nlegs; ++i ){ baricentres[i] =  scattChan.legBand[i]->mesh->elemCentre(elemID[i]);}
-//    fullAmplitude *= scattChan.functAmplitude(baricentres);
-    fullAmplitude *= scattChan.functAmplitude(elemID);
+    fullAmplitude *= scattChan.functAmplitude(baricentres);
+    
+//    fullAmplitude *= scattChan.functAmplitude(elemID);
+    return fullAmplitude;
+}
+template<int NDim, int Nlegs> Real constructAmplitude(const ScatteringChannel<NDim,Nlegs>& scattChan, const std::array<int,Nlegs>& elemID){
+    // Constructs the amplitude by including two effects
+    Real fullAmplitude = scattChan.amplitude;
+    //  -> Ratio between the actual integration volume and the integration over the reference elements
+    for (int leg=0; leg<Nlegs; ++leg) {
+        fullAmplitude *= scattChan.legBand[leg]->mesh->elemVolume * static_cast<double>(Utilities::factorial(NDim)) ;
+    }
+    //  -> Evaluation of a scattering element amplitude at the baricentres of the elements
+    ArrayPoint<NDim, Nlegs> baricentres;
+    for (int i=0; i<Nlegs; ++i ){ baricentres.col(i) =  scattChan.legBand[i]->mesh->elemCentre(elemID[i]);}
+//    std::array<Point<NDim>,Nlegs> baricentres;
+//    for (int i=0; i<Nlegs; ++i ){ baricentres[i] =  scattChan.legBand[i]->mesh->elemCentre(elemID[i]);}
+    fullAmplitude *= scattChan.functAmplitude(baricentres);
+    
+//    fullAmplitude *= scattChan.functAmplitude(elemID);
     return fullAmplitude;
 }
 
 //=======================================================
 // Scattering Precalculator
 //===================
-template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::precalculate(){
+
+template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::precalculateIndices(){
+    
+    std::ifstream  scatteringMatrixIndicesFileIn(scatteringName()+".scattIndices", std::ios::in | std::ios::binary);
+    
+    if (scatteringMatrixIndicesFileIn.good()){
+        bool same = true;
+        for (int i=0; i<Nlegs; ++i){
+            for (int d=0; d<NDim; ++d){
+                int  numSecSplit;
+                scatteringMatrixIndicesFileIn.read((char*) (&numSecSplit), sizeof(int));
+                same = same && (numSecSplit == legBand[i]->mesh->nSecSplits[d]);
+            }
+        }
+        if (same){
+            unsigned long totalSize;
+            scatteringMatrixIndicesFileIn.read((char*) (&totalSize), sizeof(unsigned long) );
+            
+            scatteringMatrixIndices.resize(totalSize);
+            scatteringMatrixIndicesCorrespondingUmklapp.resize(totalSize);
+            
+            for(unsigned long s = 0; s < totalSize; ++s){
+                for (int i=0; i<Nlegs; ++i){
+                    int index ;
+                    scatteringMatrixIndicesFileIn.read((char*) (&index), sizeof(int) );
+                    scatteringMatrixIndices[s][i] = index;
+                }
+                int umklappid;
+                scatteringMatrixIndicesFileIn.read((char*) (&umklappid), sizeof(int) );
+                scatteringMatrixIndicesCorrespondingUmklapp[s] = umklappid;
+            }
+            scatteringMatrixIndicesFileIn.close();
+            
+            std::cout << "Reading " << scatteringName() <<" from file\n";
+            
+            return;
+        }
+    }
+    
+    scatteringMatrixIndicesFileIn.close();
     
     numberNonZeroScatteringElements = 0;
     numberScatteringElementsOverThreshold = 0;
             
-//    ArrayMultiLegLinearForm<NDim,Nlegs,1+NDim*Nlegs+NDim*NDim*(Nlegs-1)*(Nlegs>2?(Nlegs-2):1)> commonLinForm;
-    Eigen::Matrix<Real, Eigen::Dynamic, Nlegs*(NDim+1)> commonLinForm;
-    commonLinForm.resize(modalOrdersCombinations.size(), Nlegs*(NDim+1));
-    for (int i=0; i<modalOrdersCombinations.size(); ++i){
-        for(int j=0; j<Nlegs; ++j){
-            commonLinForm.template block<1,NDim+1>(i,(NDim+1)*j) = legBand[j]->dispersion.fromModalToLinFormTransf.row(modalOrdersCombinations[i][j]);
-        }
+    Eigen::Matrix<Real, 1, Nlegs*(NDim+1)> commonLinForm;
+    for(int j=0; j<Nlegs; ++j){
+        commonLinForm.template block<1,NDim+1>(0,(NDim+1)*j) = legBand[j]->dispersion.fromModalToLinFormTransf.row(modalOrdersCombinations[0][j]);
     }
     
     int nUmklVecs = umklappUnitVectors.cols();
     
+    std::deque<std::array<int,Nlegs>>     dequeScatteringMatrixIndices;
+    std::deque<int>                       dequeScatteringMatrixIndicesCorrespondingUmklapp;
+    
     for (int i=0; i<nUmklVecs; ++i){
         deterministicIteration(umklappUnitVectors.col(i),
-            [this, i, &commonLinForm](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
+            [this, i, &commonLinForm, &dequeScatteringMatrixIndices, &dequeScatteringMatrixIndicesCorrespondingUmklapp]
+                               (const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
             
             Eigen::Matrix<Real, NDim+1,Nlegs*NDim> D (constructD<NDim, Nlegs>(*this, elemID));
             
@@ -430,22 +496,52 @@ template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::precalculate()
             
             if (std::fabs(result(0,0))>scattElemeThreshold){
                 ++numberScatteringElementsOverThreshold;
-                scatteringMatrixIndices.emplace_back(std::array<int,Nlegs>());
-                for (int i=0; i<Nlegs; ++i){ scatteringMatrixIndices.back()[i] = elemID[i].currentElementID;}
-                scatteringMatrix.push_back(result);
+                dequeScatteringMatrixIndices.emplace_back(std::array<int,Nlegs>());
+                for (int i=0; i<Nlegs; ++i){ dequeScatteringMatrixIndices.back()[i] = elemID[i].currentElementID;}
+                dequeScatteringMatrixIndicesCorrespondingUmklapp.emplace_back(i);
             }
             if (std::fabs(result(0,0))>0.) ++numberNonZeroScatteringElements;
         }
         );
     }
+    scatteringMatrixIndices.resize(dequeScatteringMatrixIndices.size());
+    scatteringMatrixIndicesCorrespondingUmklapp.resize(dequeScatteringMatrixIndices.size());
+    for(unsigned long i = 0; i < dequeScatteringMatrixIndices.size(); ++i){
+        scatteringMatrixIndices[i] = dequeScatteringMatrixIndices[i];
+    }
+    for(unsigned long i = 0; i < dequeScatteringMatrixIndices.size(); ++i){
+        scatteringMatrixIndicesCorrespondingUmklapp[i] = dequeScatteringMatrixIndicesCorrespondingUmklapp[i];
+    }
+    
+    // Save to file
+    std::ofstream scatteringMatrixIndicesFileOut(scatteringName()+".scattIndices", std::ios::out | std::ios::binary | std::ios::trunc);
+    for (int i=0; i<Nlegs; ++i){
+        for (int d=0; d<NDim; ++d){
+            int  numSecSplit = legBand[i]->mesh->nSecSplits[d];
+            scatteringMatrixIndicesFileOut.write((char*) (&numSecSplit), sizeof(int) );
+        }
+    }
+    unsigned long totalSize = scatteringMatrixIndices.size();
+    scatteringMatrixIndicesFileOut.write((char*) (&totalSize), sizeof(unsigned long) );
+    for(unsigned long s = 0; s < scatteringMatrixIndices.size(); ++s){
+        for (int i=0; i<Nlegs; ++i){
+            int index = scatteringMatrixIndices[s][i];
+            scatteringMatrixIndicesFileOut.write((char*) (&index), sizeof(int) );
+        }
+        int umklappid = scatteringMatrixIndicesCorrespondingUmklapp[s];
+        scatteringMatrixIndicesFileOut.write((char*) (&umklappid), sizeof(int) );
+    }
+    scatteringMatrixIndicesFileOut.close();
+    
+    std::cout << "Writing " << scatteringName() <<" to file\n";
+    
 }
-
 
 //=======================================================
 // Scattering Rates
 //===================
 
-template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteringRate(const Point<NDim>& umklappVect, const MaterialStatus<NDim>& status, MaterialStatus<NDim>& rates, const int which, const int nMCpoints, const std::vector<MeshSubsetElementIterator<NDim>>& elemID) const {
+template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteringRate(const Point<NDim>& umklappVect, const MaterialStatus<NDim>& status, MaterialStatus<NDim>& rates, const int which, const std::array<int,Nlegs>& elemID) const {
     
     Eigen::Matrix<Real, NDim+1,Nlegs*NDim> D (constructD<NDim, Nlegs>(*this, elemID));
     
@@ -478,70 +574,48 @@ template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteri
     const Real fullAmplitude (constructAmplitude<NDim, Nlegs>(*this, elemID));
     
     // Perform actual integration
-    Eigen::Matrix<Real, Nlegs*(NDim+1), 1> result = scatteringIntegrationTypeB<NDim, Nlegs>(D, N, commonLinForm0, commonLinForm1, outputformsLinForm, nMCpoints).eval();
+    Eigen::Matrix<Real, Nlegs*(NDim+1), 1> result = scatteringIntegrationTypeB<NDim, Nlegs>(D, N, commonLinForm0, commonLinForm1, outputformsLinForm, mCPoints).eval();
     result *= fullAmplitude;
     // Returns only the rate for the selected particle
     rates[legBandNumber[which]].elementVec(elemID[which]) -= legDirection[which] * result.template block<NDim+1,1>(which*(NDim+1),0) ;
-    
 };
-
-
-template<int NDim, int Nlegs> Function<NDim> ScatteringChannel<NDim,Nlegs>::scatteringRatesDeterministic(const MaterialStatus<NDim>& status, const int which) const {
-     
+template<int NDim, int Nlegs> Function<NDim> ScatteringChannel<NDim,Nlegs>::scatteringRates(const MaterialStatus<NDim>& status, const int which) const {
     assert( (which>=0 ) && (which<Nlegs) );
     
-    MaterialStatus<NDim> rates(status.material);
-    int nUmklVecs = umklappUnitVectors.cols();
-    
-    for (int i=0; i<nUmklVecs; ++i){
-        deterministicIteration(umklappUnitVectors.col(i),
-                               [&status, &rates, this, which, i](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
-            singleScatteringRate(umklappUnitVectors.col(i), status, rates, which, this->numMCPoints, elemID);
+    auto     rangetbb = tbb::blocked_range<unsigned long>(0, scatteringMatrixIndices.size());
+    MaterialStatus<NDim> identity_value(status.material);
+    auto const    toExecute = [&](tbb::blocked_range<unsigned long> r, MaterialStatus<NDim> running_rates) {
+        for (unsigned long i=r.begin(); i<r.end(); ++i) {
+            singleScatteringRate(umklappUnitVectors.col(scatteringMatrixIndicesCorrespondingUmklapp[i]), status, running_rates, which, scatteringMatrixIndices[i]);
         }
-                               );
-    }
+        return running_rates;
+    };
+    auto const     reduction = std::plus<MaterialStatus<NDim>>();
+    auto rates = tbb::parallel_reduce(rangetbb, identity_value, toExecute, reduction);
+    
+//    MaterialStatus<NDim> rates(status.material);
+//
+//    for(unsigned long i = 0; i < scatteringMatrixIndices.size(); ++i){
+//        singleScatteringRate(umklappUnitVectors.col(scatteringMatrixIndicesCorrespondingUmklapp[i]), status, rates, which, scatteringMatrixIndices[i]);
+//    }
     
     return rates[legBandNumber[which]].applyInverseMass();
 }
-template<int NDim, int Nlegs> Function<NDim> ScatteringChannel<NDim,Nlegs>::scatteringRatesDeterministic(const MaterialStatus<NDim>& status, const std::string &bandName) const{
+template<int NDim, int Nlegs> Function<NDim> ScatteringChannel<NDim,Nlegs>::scatteringRates(const MaterialStatus<NDim>& status, const std::string &bandName) const{
     Function<NDim> toreturn(status[bandName].mesh);
     for (int i=0; i<Nlegs; ++i){
         if (legBandNumber[i] == status.id(bandName)) {
-            toreturn += scatteringRatesDeterministic(status, i);
+            toreturn += scatteringRates(status, i);
         }
     }
     return toreturn;
-}
-template<int NDim, int Nlegs> Function<NDim> ScatteringChannel<NDim,Nlegs>::scatteringRatesStochastic(const MaterialStatus<NDim>& status, const int which, const int nMCpointsOuter) const {
-     
-    assert( (which>=0 ) && (which<Nlegs) );
-    
-    MaterialStatus<NDim> rates (status.material);
-    
-    // IMPORTANT!!!!!
-    // The Monte Carlo summation must be multiplied by the integration area divided by the number of Monte Carlo extractions
-    Real monteCarloAmpl = 1.0;
-    for (int i=0; i<Nlegs-1; ++i ) {monteCarloAmpl *= legBand[i]->mesh->numberSections;}
-    monteCarloAmpl /= nMCpointsOuter;
-    
-//    stochasticScatteringElementsIteration(
-    int nUmklVecs = umklappUnitVectors.cols();
-    for (int i=0; i<nUmklVecs; ++i){
-        stochasticIteration(umklappUnitVectors.col(i),
-                            nMCpointsOuter,
-                            [&status, &rates, this, which, monteCarloAmpl, i](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
-            singleScatteringRate(umklappUnitVectors.col(i), status, rates, which, this->numMCPoints, elemID);},
-                            [](){}
-                            );
-    }
-    return monteCarloAmpl * rates[legBandNumber[which]].applyInverseMass();;
 }
 
 //=======================================================
 // Scattering Propagators
 //===================
 
-template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteringPropagator(const Point<NDim>& umklappVect, const MaterialStatus<NDim>& status, MaterialStatus<NDim>& propagation, const int nMCpoints, const std::vector<MeshSubsetElementIterator<NDim>>& elemID) const {
+template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteringPropagator(const Point<NDim>& umklappVect, const MaterialStatus<NDim>& status, MaterialStatus<NDim>& propagation, const std::array<int,Nlegs>& elemID) const {
     
     Eigen::Matrix<Real, NDim+1,Nlegs*NDim> D (constructD<NDim, Nlegs>(*this, elemID));
     
@@ -569,159 +643,48 @@ template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::singleScatteri
     const Real fullAmplitude (constructAmplitude<NDim, Nlegs>(*this, elemID));
     
     // Perform actual integration
-    Eigen::Matrix<Real, Nlegs*(NDim+1), 1> result = scatteringIntegrationTypeB<NDim, Nlegs>(D, N, commonLinForm0, commonLinForm1, outputformsLinForm, nMCpoints).eval();
+    Eigen::Matrix<Real, Nlegs*(NDim+1), 1> result = scatteringIntegrationTypeB<NDim, Nlegs>(D, N, commonLinForm0, commonLinForm1, outputformsLinForm, mCPoints).eval();
     result *= fullAmplitude;
     
     for (int i=0; i<Nlegs; ++i ){ propagation[legBandNumber[i]].elementVec(elemID[i]) += legDirection[i] * result.template block<NDim+1,1>(i*(NDim+1),0);}
 };
+template<int NDim, int Nlegs> MaterialStatus<NDim> ScatteringChannel<NDim,Nlegs>::propagate(const MaterialStatus<NDim>& status) const {
 
-template<int NDim, int Nlegs> MaterialStatus<NDim> ScatteringChannel<NDim,Nlegs>::propagateDeterministic(const MaterialStatus<NDim>& status) const {
-
-    MaterialStatus<NDim> propagation(status.material);
-    
-//    deterministicScatteringElementsIteration(
-    int nUmklVecs = umklappUnitVectors.cols();
-
-    for (int i=0; i<nUmklVecs; ++i){
-        deterministicIteration(umklappUnitVectors.col(i),
-                               [&status, &propagation, this, i](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
-            singleScatteringPropagator(umklappUnitVectors.col(i), status, propagation, this->numMCPoints, elemID);
+    auto                    rangetbb = tbb::blocked_range<unsigned long>(0, scatteringMatrixIndices.size());
+    MaterialStatus<NDim>    identity_value(status.material);
+    auto const              toExecute = [&](tbb::blocked_range<unsigned long> r, MaterialStatus<NDim> running_propagation) {
+        for (unsigned long i=r.begin(); i<r.end(); ++i) {
+            singleScatteringPropagator(umklappUnitVectors.col(scatteringMatrixIndicesCorrespondingUmklapp[i]), status, running_propagation, scatteringMatrixIndices[i]);
         }
-                               );
-    }
+        return running_propagation;
+    };
+    auto const              reduction = std::plus<MaterialStatus<NDim>>();
+    auto                    propagation = tbb::parallel_reduce(rangetbb, identity_value, toExecute, reduction);
+ 
+//    MaterialStatus<NDim> propagation(status.material);
+//    for(unsigned long i = 0; i < scatteringMatrixIndices.size(); ++i){
+//        singleScatteringPropagator(umklappUnitVectors.col(scatteringMatrixIndicesCorrespondingUmklapp[i]), status, propagation, scatteringMatrixIndices[i]);
+//    }
     
     return propagation.applyInverseMass();
 }
-template<int NDim, int Nlegs> MaterialStatus<NDim> ScatteringChannel<NDim,Nlegs>::propagateStochastic(const MaterialStatus<NDim>& status, const int nMCpointsOuter) const {
-     
-    MaterialStatus<NDim> rates (status.material);
-    
-    // IMPORTANT!!!!!
-    // The Monte Carlo summation must be multiplied by the integration area divided by the number of Monte Carlo extractions
-    Real monteCarloAmpl = 1.0;
-    for (int i=0; i<Nlegs-1; ++i ) {monteCarloAmpl *= legBand[i]->mesh->numberSections;}
-    monteCarloAmpl /= nMCpointsOuter;
-    
-//    stochasticScatteringElementsIteration(
-    int nUmklVecs = umklappUnitVectors.cols();
 
-    for (int i=0; i<nUmklVecs; ++i){
-        stochasticIteration(umklappUnitVectors.col(i),
-                            nMCpointsOuter,
-                            [&status, &rates, this, monteCarloAmpl, i](const std::vector<MeshSubsetElementIterator<NDim>>& elemID){
-            singleScatteringPropagator(umklappUnitVectors.col(i), status, rates, this->numMCPoints, elemID);},
-                            [](){}
-                            );
-    }
     
-    return monteCarloAmpl * rates.applyInverseMass();
-}
-template<int NDim, int Nlegs> MaterialStatus<NDim> ScatteringChannel<NDim,Nlegs>::propagatePrecalculated(const MaterialStatus<NDim>& status) const{
-    MaterialStatus<NDim> propagation(status.material);
-    std::vector<Function<NDim>> legPopulations;  // This will store the populations in Modal
-    for (int leg=0; leg<Nlegs; ++leg){legPopulations.emplace_back(status[legBandNumber[leg]]); legPopulations[leg].toModalFromLinForm(); }
-    
-    const int nCombinations = scatteringMatrix[0].cols();
-    
-    for (int scElem = 0; scElem < scatteringMatrix.size(); ++scElem){
-        for (int col=0; col<nCombinations; ++col){
-            Real statisticFact = -1.;
-            for (int leg=0; leg<Nlegs; ++leg){
-                statisticFact *=
-                  0.5 * ( (1. - legDirection[leg]) *
-                  (modalOrdersCombinations[col][leg]==0?legPopulations[leg].fromLinFormToModalTransf(0,0):0.) +    // modal representation of 1
-                ( (1. + legDirection[leg]) * legBand[leg]->statistics + (1. - legDirection[leg]) ) *
-                         legPopulations[leg].elementVec(scatteringMatrixIndices[leg][scElem])(modalOrdersCombinations[col][leg]));
-            }
-            Real statisticFact2 = 1.;
-            for (int leg=0; leg<Nlegs; ++leg){
-                statisticFact2 *=
-                  0.5 * ( (1. + legDirection[leg]) *
-                  (modalOrdersCombinations[col][leg]==0?legPopulations[leg].fromLinFormToModalTransf(0,0):0.) +    // modal representation of 1
-                ( (1. - legDirection[leg]) * legBand[leg]->statistics + (1. + legDirection[leg]) ) *
-                         legPopulations[leg].elementVec(scatteringMatrixIndices[leg][scElem])(modalOrdersCombinations[col][leg]));
-            }
-            for (int leg=0; leg<Nlegs; ++leg){
-                propagation[legBandNumber[leg]].elementVec(scatteringMatrixIndices[scElem][leg]) +=
-                legDirection[leg] * (statisticFact+statisticFact2) * scatteringMatrix[scElem].block((NDim+1)*leg, col,NDim+1,1).transpose();
-            }
-        }
-    }
-    return propagation.applyInverseMass();
-}
-template<int NDim, int Nlegs> MaterialStatus<NDim> ScatteringChannel<NDim,Nlegs>::propagatePrecalculatedSingle(const MaterialStatus<NDim>& status, const unsigned long scElem) const{
-    MaterialStatus<NDim> propagation(status.material);
-    std::vector<Function<NDim>> legPopulations;  // This will store the populations in Modal
-    for (int leg=0; leg<Nlegs; ++leg){legPopulations.emplace_back(status[legBandNumber[leg]]); legPopulations[leg].toModalFromLinForm(); }
-    
-    const int nCombinations = scatteringMatrix[0].cols();
-    
-        for (int col=0; col<nCombinations; ++col){
-            Real statisticFact = -1.;
-            for (int leg=0; leg<Nlegs; ++leg){
-                statisticFact *=
-//                 ( (legDirection[leg]<0. && modalOrdersCombinations[col][leg]==0)?1.:0.) +            // This line is wrong, it's left for testing purposes
-                ( (legDirection[leg]<0. && modalOrdersCombinations[col][leg]==0)?legPopulations[leg].fromLinFormToModalTransf(0,0):0.) +
-                ((legDirection[leg]<0.)?legBand[leg]->statistics:1.) * legPopulations[leg].elementVec(scatteringMatrixIndices[scElem][leg])(modalOrdersCombinations[col][leg]);
-            }
-            Real statisticFact2 = 1.;
-            for (int leg=0; leg<Nlegs; ++leg){
-                statisticFact2 *=
-//                ( (legDirection[leg]>0. && modalOrdersCombinations[col][leg]==0)?1.:0.) +            // This line is wrong, it's left for testing purposes
-                ( (legDirection[leg]<0. && modalOrdersCombinations[col][leg]==0)?legPopulations[leg].fromLinFormToModalTransf(0,0):0.) +
-               ((legDirection[leg]>0.)?legBand[leg]->statistics:1.) * legPopulations[leg].elementVec(scatteringMatrixIndices[scElem][leg])(modalOrdersCombinations[col][leg]);
-            }
-            std::cout << statisticFact << " " << statisticFact2 << " / ";
-            for (int leg=0; leg<Nlegs; ++leg){
-                propagation[legBandNumber[leg]].elementVec(scatteringMatrixIndices[scElem][leg]) +=
-                legDirection[leg] * (statisticFact+statisticFact2) * scatteringMatrix[scElem].block((NDim+1)*leg, col,NDim+1,1).transpose();
-            }
-        }
-    return propagation.applyInverseMass();
-}
-    
-
-
 //=======================================================
-// I/O
+// Monte Carlo Points constructor
 //===================
-template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::saveToFile() const{
-    std::ofstream outScattMat(scatteringName()+".scttens", std::ios::out | std::ios::binary | std::ios::trunc);
-    std::ofstream outScattInd(scatteringName()+".elemind", std::ios::out | std::ios::binary | std::ios::trunc);
-    const int numrows = Nlegs*(NDim+1), numcols = modalOrdersCombinations.size();
-    const long numScattElem = scatteringMatrix.size();
-    outScattInd.write((char*) (&numScattElem), sizeof(long) );
-    for(int scatElem = 0; scatElem<numScattElem; ++scatElem){
-        outScattMat.write((char*) scatteringMatrix[scatElem].data(), numrows*numcols*sizeof(Real) );
-        for(int leg=0; leg<Nlegs; ++leg){
-            outScattInd.write((char*) (&scatteringMatrixIndices[scatElem][leg]), sizeof(int) );
-        }
+
+template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::constructMCPoints(){
+    mCPoints.resize(Eigen::NoChange, numMCPoints);
+    for (int i = 0; i < Nlegs - 2; ++i){
+        mCPoints.template middleRows<NDim>(i*NDim) = randomPointsReference<NDim>(numMCPoints);
     }
-    outScattMat.close();
-    outScattInd.close();
-}
-template<int NDim, int Nlegs> void ScatteringChannel<NDim,Nlegs>::loadFromFile(){
-    std::ifstream inScattMat(scatteringName()+".scttens", std::ios::in | std::ios::binary);
-    std::ifstream inScattInd(scatteringName()+".elemind", std::ios::in | std::ios::binary);
-    scatteringMatrix.clear();
-    scatteringMatrixIndices.clear();
-    const int numrows = Nlegs*(NDim+1), numcols = modalOrdersCombinations.size();
-    long numScattElem;
-    inScattInd.read((char*) (&numScattElem), sizeof(long));
-    std::array<int,Nlegs> indices;
-    Eigen::Matrix<Real, Nlegs*(NDim+1), Eigen::Dynamic> scattElemMatr; scattElemMatr.resize(Nlegs*(NDim+1), numcols);
-    for(int scatElem = 0; scatElem<numScattElem; ++scatElem){
-        inScattMat.read( (char *) scattElemMatr.data() , numrows*numcols*sizeof(Real) );
-        scatteringMatrix.push_back(scattElemMatr);
-        for(int leg=0; leg<Nlegs; ++leg){
-            inScattInd.read((char*) (&indices[leg]), sizeof(int) );
-        }
-        scatteringMatrixIndices.push_back(indices);
+    // Notice that there is one row in mCPoints that contains uninitialised data
+    // That was done as a horrible workaround since mCPoints would have 0 rows for NDim = 1 and NLegs = 2
+    // Eigen does not accept empty matrices
+    if constexpr(NDim>1){
+        mCPoints.template bottomRows<NDim-1>() = randomPointsReference<NDim-1>(numMCPoints);
     }
-    numberScatteringElementsOverThreshold = numScattElem;
-    numberNonZeroScatteringElements = -1;
-    inScattMat.close();
-    inScattInd.close();
 }
 
 

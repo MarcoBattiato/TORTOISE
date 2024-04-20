@@ -48,7 +48,7 @@ using std::cout;
 int main(int argc, const char * argv[]) {
     
     // Let us build the material
-    real                pi = 3.1415;
+    Real                pi = 3.1415;
     Point<2>            originBZ({0.0, 0.}), sideBZ0({1.0, 0.0}), sideBZ1({-.5, std::sqrt(3.0)/2});
     Point<2>            ortsideBZ0({.0, 1.0}), ortsideBZ1({std::sqrt(3.0)/2, .5});
     Region<2>           brillouinZone (originBZ,{sideBZ0,sideBZ1});
@@ -60,7 +60,7 @@ int main(int argc, const char * argv[]) {
     Mesh<2>             meshB(brillouinZone, {0.6,0.6},{0.3,0.3},{resolution,resolution});
     Mesh<2>             meshPhot(brillouinZone, {0.,0.},{0.001,0.0001},{5*resolution,1});
 
-    real                photMaxEnergy = 2.5;
+    Real                photMaxEnergy = 2.5;
 
     exMat.addBand("pn:ac0", 0, boson, meshFull, 0.05);
     exMat.addBand("el:V_A", -1, fermion, meshA, -1.1+sin(pi*dot(ortsideBZ0,k - 0.101*sideBZ0 - 0.1*sideBZ1)/(0.3*std::sqrt(3.0)/2))*sin(pi*dot(ortsideBZ1,k- 0.101*sideBZ0 - 0.1*sideBZ1)/(0.3*std::sqrt(3.0)/2)));
@@ -82,7 +82,7 @@ int main(int argc, const char * argv[]) {
     MaterialStatus<2>   equil(exMat);
     // Notice how the constructor needs the material, as it needs to know the bands for which it needs to accommodate populations
     
-    const real chemPot = 0.0, temp = 0.1;
+    const Real chemPot = 0.0, temp = 0.1;
     // We now assign the populations. The population of each band in the MaterialStatus object is accessed using the same string
     // id as the original band. For instance we can
     equil["el:V_A"] = 1/(exp((exMat["el:V_A"].dispersion-chemPot)/temp)+1);

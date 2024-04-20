@@ -60,6 +60,8 @@
 
 namespace Tortoise {
 
+namespace Utilities {
+
 double interpolate1D(const std::vector<std::array<double,2>>& data, double x, bool extrapolate = false){
     // Assumes that the values are sorded with respect to x
     unsigned long size = data.size();
@@ -165,21 +167,46 @@ double interpolate(const std::vector<double> &xData, const std::vector<double> &
     return yL + dydx * ( x - xL );
 }
 
+double interpolate(const std::vector<std::pair<double,double>> &data, double x, bool extrapolate ){
+    // Assumes that the values are sorded with respect to x
+    unsigned long size = data.size();
+    
+    unsigned long i = 0;
+    if ( x >= data[size - 2].first ){ i = size - 2;}
+    else {while ( x > data[i+1].first ) i++;}
+    double xL = data[i].first, yL = data[i].second, xR = data[i+1].first, yR = data[i+1].second;
+    if ( !extrapolate )
+    {
+        if ( x < xL ) yR = yL;
+        if ( x > xR ) yL = yR;
+    }
+    double dydx = ( yR - yL ) / ( xR - xL );
+    return yL + dydx * ( x - xL );
+}
+
+
 struct xydata { std::vector<double> x; std::vector<double> y; };
 
 class Interpolator {
 public:
     bool extrapolate = true;
-private:
-    std::vector<double> x;
-    std::vector<double> y;
+public:
+    std::vector<std::pair<double,double>> data;
 public:
     Interpolator(){};
-    Interpolator(const std::vector<double>& _x, const std::vector<double>& _y): x(_x), y(_y){};
-    void addData(const double _x, const double _y) { x.emplace_back(_x); y.emplace_back(_y);}
-    void prepareForInterpolation(){ }
-    double operator()(double p) const {return interpolate(x,y,p,extrapolate);}
-    double operator()(Eigen::Matrix<double, 1, 1> p) const {return interpolate(x,y,p(0),extrapolate);}
+    Interpolator(const std::vector<double>& _x, const std::vector<double>& _y){
+        assert(_x.size() == _y.size());
+        for (int i = 0; i < _x.size(); ++i){
+            data.push_back(std::make_pair(_x[i], _y[i]));
+        }
+    };
+    void addData(const double _x, const double _y) { data.push_back(std::make_pair(_x, _y));}
+    void prepareForInterpolation(){
+        auto comparison = [](const std::pair<double,double> a, const std::pair<double,double> b){return a.first < b.first; };
+        std::sort(data.begin(), data.end(), comparison);
+    }
+    double operator()(double p) const {return interpolate(data,p,extrapolate);}
+    double operator()(Eigen::Matrix<double, 1, 1> p) const {return interpolate(data,p(0),extrapolate);}
 };
 
 xydata loadTxt(const std::string filename){
@@ -209,6 +236,8 @@ public:
     double operator()(double x){return interpolate(data.x,data.y,x,extrapolate);}
     double operator()(Eigen::Matrix<double, 1, 1> p ){return interpolate(data.x,data.y,p(0),extrapolate);}
 };
+
+} // namespace Utilities
 
 } // namespace Tortoise
 #endif /* DataFromFile_hpp */

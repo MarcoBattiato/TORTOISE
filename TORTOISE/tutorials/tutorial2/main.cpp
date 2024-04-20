@@ -51,7 +51,7 @@ int main(int argc, const char * argv[]) {
     
     // We first must build the brillouin zone.
     
-    real                pi = 3.1415;
+    Real                pi = 3.1415;
     Point<2>            originBZ({0.0, 0.}),
                         sideBZ0({1.0, 0.0}),
                         sideBZ1({-.5, std::sqrt(3.0)/2});
@@ -148,7 +148,7 @@ int main(int argc, const char * argv[]) {
     // We have then assigned the desired resolution on the longest direction (that will reflect in the obtained energy resolution) and only one in
     // the other direction.
     
-    real                photMaxEnergy = 2.5;
+    Real                photMaxEnergy = 2.5;
     exMat.addBand("pt:Lin", 0, boson, meshPhot, photMaxEnergy*dot(ortsideBZ1, k)/(0.001*std::sqrt(3.0)/2));
     
     // We define the photon dispersion as a plane. Notice that when constructing the dispersion, we need to be careful since using a more straightforward

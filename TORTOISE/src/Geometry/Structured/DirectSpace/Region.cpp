@@ -126,6 +126,16 @@ template<int NDim> bool Region<NDim>::equivalentTo(const std::string &FileName) 
 // I/O
 //===================
 
+//template<int NDim> std::ostream &operator<<(std::ostream &os, Region<NDim> const& region) {
+//    os <<  "********************************************\n";
+//    os <<  " Region: \n";
+//    os <<  "origin  : " + to_string(region.origin.transpose()) + "\n";
+//    for (int i=0; i<NDim; ++i) {
+//        os <<  "gVec[" + std::to_string(i) + "] : " + to_string(region.gVec.col(i).transpose()) + "\n";
+//    }
+//    os <<  "********************************************\n";
+//}
+
 template<int NDim> void Region<NDim>::writeToTxtFile(const std::string &FileName) const {
     std::ofstream myfile (FileName);
     for (int i=0; i<NDim; ++i) { myfile << origin(i,0) << " ";}

@@ -39,17 +39,19 @@
 
 #include <cassert>
 
+using Tortoise::Containers::StringMap;
+
 namespace Tortoise {
 
 //=======================================================
 // Constructors
 //===================
-template<int NDim> MaterialStatus<NDim>::MaterialStatus(const Material<NDim> &t_material): material(&t_material) {
+template<int NDim> MaterialStatus<NDim>::MaterialStatus(Material<NDim> &t_material): material(&t_material) {
     for (int i=0; i < t_material.size(); i++) {
         this->emplace_back(t_material.id(i),Function<NDim>(*(t_material[i].mesh)));
     }
 };
-template<int NDim> MaterialStatus<NDim>::MaterialStatus(const Material<NDim> *t_material): material(t_material) {
+template<int NDim> MaterialStatus<NDim>::MaterialStatus(Material<NDim> *t_material): material(t_material) {
     for (int i=0; i < t_material->size(); i++) {
         this->emplace_back(t_material->id(i),Function<NDim>(*((*t_material)[i].mesh)));
     }
@@ -140,44 +142,45 @@ template<int NDim> MaterialStatus<NDim>& MaterialStatus<NDim>::applyInverseMass(
 // Propagations
 //********************************
 
-template<int NDim> MaterialStatus<NDim> MaterialStatus<NDim>::propagateDeterministic() const{
+
+template<int NDim> MaterialStatus<NDim> MaterialStatus<NDim>::propagate() const{
     MaterialStatus<NDim> toreturn(material);
     for (int i=0; i<material->scatteringChannelsList2Legs.size(); ++i){
         if (material->scatteringChannelsList2Legs[i].amplitude != 0.)
-            toreturn += material->scatteringChannelsList2Legs[i].propagateDeterministic(*this);
+            toreturn += material->scatteringChannelsList2Legs[i].propagate(*this);
     }
     for (int i=0; i<material->scatteringChannelsList3Legs.size(); ++i){
         if (material->scatteringChannelsList3Legs[i].amplitude != 0.)
-            toreturn += material->scatteringChannelsList3Legs[i].propagateDeterministic(*this);
+            toreturn += material->scatteringChannelsList3Legs[i].propagate(*this);
     }
     for (int i=0; i<material->scatteringChannelsList4Legs.size(); ++i){
         if (material->scatteringChannelsList4Legs[i].amplitude != 0.)
-            toreturn += material->scatteringChannelsList4Legs[i].propagateDeterministic(*this);
+            toreturn += material->scatteringChannelsList4Legs[i].propagate(*this);
     }
     return toreturn;
 }
 
 
-template<int NDim> MaterialStatus<NDim> MaterialStatus<NDim>::scatteringRatesDeterministic() const{
+template<int NDim> MaterialStatus<NDim> MaterialStatus<NDim>::scatteringRates() const{
     MaterialStatus<NDim> toreturn(material);
     assert(false);
     return toreturn;
 };
 
-template<> MaterialStatus<2> MaterialStatus<2>::scatteringRatesDeterministic() const{
+template<> MaterialStatus<2> MaterialStatus<2>::scatteringRates() const{
     MaterialStatus<2> toreturn(material);
     for (auto band : material->matchListId("*")) {
         for (int i=0; i<material->scatteringChannelsList2Legs.size(); ++i){
             if (material->scatteringChannelsList2Legs[i].amplitude != 0.)
-                toreturn[band] += material->scatteringChannelsList2Legs[i].scatteringRatesDeterministic(*this, band);
+                toreturn[band] += material->scatteringChannelsList2Legs[i].scatteringRates(*this, band);
         }
         for (int i=0; i<material->scatteringChannelsList3Legs.size(); ++i){
             if (material->scatteringChannelsList3Legs[i].amplitude != 0.)
-                toreturn[band] += material->scatteringChannelsList3Legs[i].scatteringRatesDeterministic(*this, band);
+                toreturn[band] += material->scatteringChannelsList3Legs[i].scatteringRates(*this, band);
         }
         for (int i=0; i<material->scatteringChannelsList4Legs.size(); ++i){
             if (material->scatteringChannelsList4Legs[i].amplitude != 0.)
-                toreturn[band] += material->scatteringChannelsList4Legs[i].scatteringRatesDeterministic(*this, band);
+                toreturn[band] += material->scatteringChannelsList4Legs[i].scatteringRates(*this, band);
         }
     }
     return toreturn;
@@ -200,6 +203,20 @@ template<int NDim> MaterialStatus<NDim> MaterialStatus<NDim>::applyConstraints(R
         }
     }
     return toReturn;
+}
+
+//********************************
+//* Utilities
+//********************************
+
+template<int NDim> void MaterialStatus<NDim>::setToEquilibrium(Real temperature, Real chemicalPotentialFermions, Real chemicalPotentialBosons){
+    for (auto band : material->matchListIndex("*")) {
+        if ((*material)[band].statistics == fermion) {
+            (*this)[band] = 1./(exp( ((*material)[band].dispersion - chemicalPotentialFermions)/temperature ) + 1.);
+        } else {
+            (*this)[band] = 1./(exp( ((*material)[band].dispersion - chemicalPotentialBosons)/temperature ) - 1.);
+        }
+    }
 }
 
 //********************************

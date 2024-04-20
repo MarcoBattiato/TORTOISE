@@ -69,6 +69,8 @@
 
 namespace Tortoise {
 
+namespace Containers {
+
 template <class DataType> class StringMap {
     //=======================================================
     // Properties
@@ -152,17 +154,17 @@ public:
     //===================
     std::vector<DataType*> matchList(const std::string& idWildCard) const {
         std::vector<DataType*> toreturn;
-        for (int i=0; i<ids.size(); i++){ if (matchString(idWildCard,ids[i])) {toreturn.emplace_back(&data(i));} }
+        for (int i=0; i<ids.size(); i++){ if (Utilities::matchString(idWildCard,ids[i])) {toreturn.emplace_back(&data(i));} }
         return toreturn;
     }
     std::vector<int> matchListIndex(const std::string& idWildCard) const {
         std::vector<int> toreturn;
-        for (int i=0; i<ids.size(); i++){ if (matchString(idWildCard,ids[i])) {toreturn.emplace_back(i);} }
+        for (int i=0; i<ids.size(); i++){ if (Utilities::matchString(idWildCard,ids[i])) {toreturn.emplace_back(i);} }
         return toreturn;
     }
     std::vector<std::string> matchListId(const std::string& idWildCard) const {
         std::vector<std::string> toreturn;
-        for (unsigned long i=0; i<ids.size(); i++){ if (matchString(idWildCard,ids[i])) {toreturn.emplace_back(ids[i]);} }
+        for (unsigned long i=0; i<ids.size(); i++){ if (Utilities::matchString(idWildCard,ids[i])) {toreturn.emplace_back(ids[i]);} }
         return toreturn;
     }
     
@@ -171,6 +173,8 @@ public:
         return -1;
     };
 };
+
+} // namespace Containers
 
 } // namespace Tortoise
 

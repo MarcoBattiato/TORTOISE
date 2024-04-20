@@ -76,42 +76,42 @@ public:
     //*******************************
     // Dimensionality constants
     //*******************************
-    static constexpr int                            nVertElement = NDim+1;                  // Number of vertices in Element
-    static constexpr int                            nElementSection = factorial(NDim);      // Number of element per reference Section
-    static const VectorElement<NDim>                vertElemInRefSec;                       // Vertices of Ref Elements (They all share the first vertex at the origin)
+    static constexpr int                            nVertElement = NDim+1;                          // Number of vertices in Element
+    static constexpr int                            nElementSection = Utilities::factorial(NDim);   // Number of element per reference Section
+    static const VectorElement<NDim>                vertElemInRefSec;                               // Vertices of Ref Elements (They all share the first vertex at the origin)
 
 public: // DO NOT CHANCE THE ORDER!!! IT WILL BREAK THE CONSTRUCTOR!!!
     //*******************************
     // Mesh features
     //*******************************
-    const Region<NDim>*                             region;                                 // Region the mesh is part of
+    Region<NDim> const * const                      region;                                 // Region the mesh is part of
 
-    const Point<NDim>                               origin;                                 // origin of the Mesh
-    const ArrayPoint<NDim,NDim>                     gVec;                                   // Mesh sides vectors
-    const ArrayPoint<NDim,NDim>                     invgVec;                                // Inverse of Matrix formed by Mesh sides vectors
+    Point<NDim> const                               origin;                                 // origin of the Mesh
+    ArrayPoint<NDim,NDim> const                     gVec;                                   // Mesh sides vectors
+    ArrayPoint<NDim,NDim> const                     invgVec;                                // Inverse of Matrix formed by Mesh sides vectors
 
-    const CartIndex<NDim>                           nSecSplits;                             // Number of sectioning per dimensions
+    CartIndex<NDim> const                           nSecSplits;                             // Number of sectioning per dimensions
 
-    const int                                       numberSections;                         // Total number of sections
-    const int                                       numberElements;                         // Total number of elements
-    const int                                       dataVectorDim;                          // Total number of basis functions
+    int const                                       numberSections;                         // Total number of sections
+    int const                                       numberElements;                         // Total number of elements
+    int const                                       dataVectorDim;                          // Total number of basis functions
 
-    const ArrayPoint<NDim,NDim>                     dGVec;                                  // Sides of the sections
-    const ArrayPoint<NDim,NDim>                     invdGVec;                               // Inverse of Matrix formed by sides of the sections
+    ArrayPoint<NDim,NDim> const                     dGVec;                                  // Sides of the sections
+    ArrayPoint<NDim,NDim> const                     invdGVec;                               // Inverse of Matrix formed by sides of the sections
 
-    const Real                                      elemVolume;                             // Area of the element
-    const LinTransform<NDim>                        massMatrix;                             // Mass matrix for linear functional representation
-    const LinTransform<NDim>                        invMassMatrix;                          // Inverse of Mass matrix for linear functional representation
+    Real const                                      elemVolume;                             // Area of the element
+    GeometryCore::LinTransform<NDim> const          massMatrix;                             // Mass matrix for linear functional representation
+    GeometryCore::LinTransform<NDim> const          invMassMatrix;                          // Inverse of Mass matrix for linear functional representation
 
-    const Point<NDim>                               relativeOrigin;                         // origin of the Mesh in fraction of Region
-    const Point<NDim>                               relativegVec;                           // Mesh sides vectors in fraction of Region
-    const Point<NDim>                               relativedGVec;                          // Mesh sides vectors in fraction of Region
+    Point<NDim> const                               relativeOrigin;                         // origin of the Mesh in fraction of Region
+    Point<NDim> const                               relativegVec;                           // Mesh sides vectors in fraction of Region
+    Point<NDim> const                               relativedGVec;                          // Mesh sides vectors in fraction of Region
 
-    const VecOfDataVector                           verticesCoord;                          // Stores the coordinates of the vertices
+    VecOfDataVector const                           verticesCoord;                          // Stores the coordinates of the vertices
 
-    const VectorLinearForm<NDim>                    basisFuncLF;                            // Linear forms corresponding to the basis functions
-    const std::vector<VectorLinearForm<NDim>>       basisFuncDerivLF;                       // Linear forms corresponding to the derivatives of the basis functions
-    const VecOfDataVector                           basisFuncDerivLF0thOrd;                 // Linear forms corresponding to the derivatives of the basis functions
+    GeometryCore::VectorLinearForm<NDim> const      basisFuncLF;                            // Linear forms corresponding to the basis functions
+    std::vector<GeometryCore::VectorLinearForm<NDim>> const  basisFuncDerivLF;                       // Linear forms corresponding to the derivatives of the basis functions
+    VecOfDataVector const                           basisFuncDerivLF0thOrd;                 // Linear forms corresponding to the derivatives of the basis functions
     
     // Methods
 public:
@@ -121,9 +121,9 @@ public:
     // The endpoints of the mesh are origin+gVec[1], origin+gVec[2], ...
     // The origin has to be passed in relative position compared to the region's origin and gVec's
     //===================
-    Mesh(const Region<NDim>& t_region, const Point<NDim>& t_relativeOrigin, const Point<NDim>& t_relativegVec, const CartIndex<NDim>& t_nSecSplits);
-    Mesh(const Region<NDim>* t_region, const Point<NDim>& t_relativeOrigin, const Point<NDim>& t_relativegVec, const CartIndex<NDim>& t_nSecSplits);
-    // In 1D a constructor accepting Real numbers is provided
+    Mesh(Region<NDim> const & t_region, const Point<NDim>& t_relativeOrigin, const Point<NDim>& t_relativegVec, const CartIndex<NDim>& t_nSecSplits);
+    Mesh(Region<NDim> const * const t_region, const Point<NDim>& t_relativeOrigin, const Point<NDim>& t_relativegVec, const CartIndex<NDim>& t_nSecSplits);
+    // In 1D a constructor accepting real numbers is provided
     Mesh(const Region<NDim>& t_region, const Real t_relativeOrigin, const Real t_relativegVec, const int t_nSecSplits) requires (NDim == 1);
     Mesh(const Region<NDim>* t_region, const Real t_relativeOrigin, const Real t_relativegVec, const int t_nSecSplits) requires (NDim == 1);
     //===================
@@ -181,6 +181,13 @@ public:
     Point<NDim> elemCentre(const MeshSubsetElementIterator<NDim>& t_elementID) const;
     Point<NDim> elemCentre(const int t_elementID) const;
     
+    bool        inMesh(const Point<NDim>& refCoord) const;                          // Returns true if the point is within the mesh
+    std::pair<int, Point<NDim>> relativeCoord(const Point<NDim>& refCoord) const;   // Returns element index and relative coordinates of a point given in absolute coordinates
+    
+    //=======================================================
+    // Associated Meshes
+    //===================
+    Mesh<NDim>     convolutionMesh() const;     // Returns the mesh over which the associated convolution functions should be defined
     
     //=======================================================
     // Adjacency Map and Faces
@@ -220,10 +227,10 @@ public:
     Mesh(const Region<NDim>&& t_region, const Point<NDim>& t_relativeOrigin, const Point<NDim>& t_relativegVec, const CartIndex<NDim>& t_nSecSplits) = delete;
     Mesh(const Region<NDim>&& t_region, const Real t_relativeOrigin, const Real t_relativegVec, const int t_nSecSplits) requires (NDim ==1) = delete;
 
-
 };
 
 template<int NDim> std::ostream &operator<<(std::ostream &t_os, Mesh<NDim> const& t_mesh);
+
 Plotter3D& operator << (Plotter3D& plotter, const Mesh<3>& t_mesh);
 Plotter3D& operator << (Plotter3D& plotter, const Mesh<2>& t_mesh);
 Plotter2D& operator << (Plotter2D& plotter, const Mesh<2>& t_mesh);

@@ -45,6 +45,8 @@
 
 namespace Tortoise {
 
+namespace Utilities {
+
 class RandomNGenerator {
     std::default_random_engine                      generator;
 public:
@@ -75,6 +77,8 @@ public:
 
 
 extern RandomNGenerator randGen;
+
+} // namespace Utilities
 
 } // namespace Tortoise
 

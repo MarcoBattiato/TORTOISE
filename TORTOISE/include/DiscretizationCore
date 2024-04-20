@@ -49,9 +49,14 @@
 #include "Generics/Algorithms/RungeKutta4.hpp"
 #include "Generics/Algorithms/DormandPrince54.hpp"
 #include "Generics/Algorithms/NelderMead.hpp"
+#include "Generics/Algorithms/BisectionFalsePosition.hpp"
+
+#include "Generics/MachineLearning/Polynomial.hpp"
+#include "Generics/MachineLearning/FourierInterpolant.hpp"
 
 #include "Geometry/GeometryCore/Geometry.hpp"
-#include "Geometry/GeometryCore/AnalyticFunction.hpp"
+
+#include "Geometry/AnalyticExpressions/AnalyticFunction.hpp"
 
 #include "Geometry/Plotter/Plotter.hpp"
 
@@ -62,6 +67,9 @@
 
 #include "Geometry/Structured/FunctionSpace/FunctionElement.hpp"
 #include "Geometry/Structured/FunctionSpace/Function.hpp"
+
+// #include <Geometry/Structured/DirectSpace/Polygonal/PolygonalMesh.hpp>
+// #include <Geometry/Structured/DirectSpace/Polygonal/PolygonalMeshIterators.hpp>
 
 #include "Generics/Utilities/DataMatrix.hpp"
 #include "Generics/Utilities/DataFromFile.hpp"

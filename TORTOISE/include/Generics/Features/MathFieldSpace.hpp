@@ -39,6 +39,8 @@
 
 namespace Tortoise {
 
+namespace Features {
+
 template <class fieldType> class MathFieldSpace {
 public:
 //    virtual fieldType& operator+=(const fieldType& other) = 0;
@@ -148,6 +150,8 @@ public:
         return lhs;
     }
 };
+
+} // namespace Features
 
 } // namespace Tortoise 
 

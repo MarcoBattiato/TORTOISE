@@ -43,9 +43,17 @@
 #include <iomanip>
 #include <sstream>
 
+namespace Tortoise {
+
+namespace Utilities {
+
 bool matchString(const std::string &patternWildCards, const std::string &candidate) ;
 
 std::string toString(int value, int digitsCount);
+
+} // namespace Utilities
+
+} // namespace Tortoise
 
 
 #endif /* StringUtilities_hpp */

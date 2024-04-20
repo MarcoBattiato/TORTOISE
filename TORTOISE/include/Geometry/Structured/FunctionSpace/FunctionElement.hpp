@@ -50,14 +50,14 @@ namespace Tortoise {
 template <int NDim> class Mesh;
 
 template<int NDim> class FunctionElement :                  // Inherits all the operations of a field from MathFieldSpace and AsymmetricMathFieldSpace
-    public MathFieldSpace<FunctionElement<NDim>>,
-    public AsymmetricMathFieldSpace<FunctionElement<NDim>, Real> { //,
+public Features::MathFieldSpace<FunctionElement<NDim>>,
+public Features::AsymmetricMathFieldSpace<FunctionElement<NDim>, Real> { //,
     //public AsymmetricMathFieldSpace<FunctionElement<NDim>, std::function<Real(Point<NDim>)>>{
         
 public:
-    const Mesh<NDim>*       mesh;
-    const int               elemID;
-    LinearForm<NDim>        vec;
+    Mesh<NDim> const * const            mesh;
+    int const                           elemID;
+    GeometryCore::LinearForm<NDim>      vec;
 
 public:
     //=======================================================

@@ -78,11 +78,11 @@ template<int NDim> class Function :
 // interpretation were to be used for * and /, problems arise (especially in the case of /). If the user wants to do those operations he/she should first
 // construct a Function from the FunctionElement and explicitly set the value everywhere else to avoid confusion.
 // This inheritance constructs all the possible combinations of operators
-    public MathFieldSpace<Function<NDim>> ,
-    public AsymmetricMathFieldSpaceByValue<Function<NDim>,Real> ,
-//    public AsymmetricMathFieldSpace<FunctionElement<NDim>, std::function<Real(Point<NDim>)>> ,
-    public AsymmetricVectorSpace< Function<NDim>, FunctionElement<NDim>> ,
-    public AsymmetricMathFieldSpace< Function<NDim>, std::function<Real(Point<NDim>)>>{
+public Features::MathFieldSpace<Function<NDim>> ,
+public Features::AsymmetricMathFieldSpaceByValue<Function<NDim>,Real> ,
+//    public Features::AsymmetricMathFieldSpace<FunctionElement<NDim>, std::function<Real(Point<NDim>)>> ,
+public Features::AsymmetricVectorSpace< Function<NDim>, FunctionElement<NDim>> ,
+public Features::AsymmetricMathFieldSpace< Function<NDim>, std::function<Real(Point<NDim>)>>{
 
         
         
@@ -92,31 +92,32 @@ template<int NDim> class Function :
 //~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~
 public:
-    const Mesh<NDim>*   mesh;
-    DataVector          vec;
+    Mesh<NDim> const * const    mesh;
+    DataVector                  vec;
     
-    static const LinTransform<NDim>  fromLinFormToModalTransf;
-    static const LinTransform<NDim>  fromModalToLinFormTransf;
+    static GeometryCore::LinTransform<NDim> const  fromLinFormToModalTransf;
+    static GeometryCore::LinTransform<NDim> const  fromModalToLinFormTransf;
         
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Main methods
+/// Main methods
 //~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~
+
 public:
     //=======================================================
     // Constructors
     //===================
     explicit Function(const Mesh<NDim>& t_mesh);                                                    // Constructs a constant 0 function
-    Function(const Mesh<NDim>& t_mesh, const Real t_value);                                // Constructs a constant function
+    Function(const Mesh<NDim>& t_mesh, const Real t_value);                                         // Constructs a constant function
     Function(const Mesh<NDim>& t_mesh, const DataVector& t_nodalValues);                            // Constructs using the values at nodes
-    Function(const Mesh<NDim>& t_mesh, const std::function<Real(Point<NDim>)>& t_f);       // Constructs using the function passed
+    Function(const Mesh<NDim>& t_mesh, const std::function<Real(Point<NDim>)>& t_f);                // Constructs using the function passed
     explicit Function(const Mesh<NDim>* t_mesh);                                                    // Constructs a constant 0 function
-    Function(const Mesh<NDim>* t_mesh, const Real t_value);                                // Constructs a constant function
+    Function(const Mesh<NDim>* t_mesh, const Real t_value);                                         // Constructs a constant function
     Function(const Mesh<NDim>* t_mesh, const DataVector& t_nodalValues);                            // Constructs using the values at nodes
-    Function(const Mesh<NDim>* t_mesh, const std::function<Real(Point<NDim>)>& t_f);       // Constructs using the function passed
-    Function(const std::function<Real(Real)>& t_f, const Function<NDim>& t_other);// Constructs a function of a function f(other)
-    Function(const std::function<Real(std::vector<Real>)>& t_f, const std::vector<Function<NDim>>& t_others);// Constructs a function of a function f(other[0], other[1], ...)
+    Function(const Mesh<NDim>* t_mesh, const std::function<Real(Point<NDim>)>& t_f);                // Constructs using the function passed
+    Function(const std::function<Real(Real)>& t_f, const Function<NDim>& t_other);                  // Constructs a function of a function f(other)
+    Function(const std::function<Real(std::vector<Real>)>& t_f, const std::vector<Function<NDim>>& t_others); // Constructs a function of a function f(other[0], other[1], ...)
     Function(const Function<NDim>& t_other);                                                        // Copy constructor
     Function(Function<NDim>&& t_other);                                                             // Move constructor
     
@@ -213,6 +214,10 @@ public:
     Real  integrate() const;                                                                   // Calculates the integral of the function
     Real  integrate(const Function<NDim>& rhs) const;                                          // Calculates the integral of the function multiplied by another one
     Real  integrate(const Function<NDim>& rhs1, const Function<NDim>& rhs2) const;             // Calculates the integral of the function multiplied other two
+    Real  integrateDiracDelta(const Function<NDim>& functInDiracDelta) const;                  // Calculates the integral of the function multiplied another Dirac-delta function
+    Mesh<NDim>     convolutionMesh() const;                                                    // Returns the mesh over which the associated convolution function should be defined
+    Function<NDim> convolve(const Function<NDim>& convolveFunction) const;
+            
     Function<NDim> derivative(const int direction) const;                                      // Calculates the derivative
                 
     Function&      applyInverseMass();                                                         // Multiplies by inverse mass (it modifies the function!!!)
@@ -228,8 +233,14 @@ public:
     
     void plot(const std::string& t_title = "") const;
     void plot(const VectorPoint<NDim>& line, const std::vector<std::string>& names, const std::string& t_title = "") const;
-
-        
+    void writeToTxtFile(const std::string &FileName) const;
+    // Added by Xavier, Dec 2023 : Begin
+    void writeToTxtFilePlot(const std::string &FileName) const; // Creates file to be used by plotting programs like GNUPlot
+    void writeToTxtFilePlotPy(std::string &FileNameP)  const; // Creates file to be used by plotting programs like GNUPlot
+    void writeToTxtFilePlotAppend(std::string &FileName)  const; // Creates file to be used by plotting programs like GNUPlot
+    void writeToTxtFilePlotColour(std::string &FileName)  const;
+    // Added by Xavier, Dec 2023 : End
+    
     //=======================================================
     // Technicalities
     //=======================================================
@@ -237,7 +248,7 @@ public:
     auto elementview();         // Returns a map. Can be used to modify directly vec, but it is accessed in element view
     auto elementview() const ;  // Returns a map. Cannot be used to modify directly vec, since it is constant
     void toNodalFromLinForm() ;      // Modifies the vec (the user should remember to eventually modify it back into linear form representation)
-    void toLinFormFromNodal() ;    // Modifies the vec
+    void toLinFormFromNodal() ;      // Modifies the vec
     Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> toNodalFromLinForm() const ; // When the object is const it cannot modify the vec, but instead it returns a matrix. It is up to the user to store it
     void toModalFromLinForm();
     void toLinFormFromModal();
@@ -252,8 +263,8 @@ public:
 
 template<int NDim> class Projected{
 public:
-    const Function<NDim>&  fun;
-    const VectorPoint<NDim>& line;
+    Function<NDim> const&  fun;
+    VectorPoint<NDim> const& line;
     std::vector<std::string> names;
     Projected(const Function<NDim>& fun, const VectorPoint<NDim>& line, const std::vector<std::string>& names): fun(fun), line(line), names(names){}
     Projected(const Function<NDim>& fun, const VectorPoint<NDim>& line): fun(fun), line(line){
@@ -261,9 +272,22 @@ public:
     }
 };
 
+template<int NDim> class ProjectedShifted{
+public:
+    Function<NDim> const&  fun;
+    VectorPoint<NDim> const& line;
+    std::vector<std::string> names;
+    Real const shift;
+    ProjectedShifted(const Function<NDim>& fun, Real shift, const VectorPoint<NDim>& line, const std::vector<std::string>& names): fun(fun), shift(shift), line(line), names(names){}
+    ProjectedShifted(const Function<NDim>& fun, Real shift, const VectorPoint<NDim>& line): fun(fun), shift(shift), line(line){
+        for (int i=0; i<line.cols(); ++i){ names.emplace_back("");}
+    }
+};
+
 Plotter3D& operator << (Plotter3D& plotter, const Function<2>& function);
 Plotter2D& operator << (Plotter2D& plotter, const Function<1>& function);
 Plotter2D& operator << (Plotter2D& plotter, const Projected<2>& projFunction);
+Plotter2D& operator << (Plotter2D& plotter, const ProjectedShifted<2>& projFunction);
 
 template<int NDim> Function<NDim> operator/(const Real lhs, Function<NDim> rhs);
 template<int NDim> Function<NDim> operator/(const std::function<Real(Point<NDim>)>& lhs, Function<NDim> rhs);
@@ -290,10 +314,10 @@ template<int NDim> auto exp(const Function<NDim>& other) { return Function<NDim>
 
 template<int NDim> auto min(const Function<NDim>& f0, const Function<NDim>& f1) { return Function<NDim>([](const std::vector<Real>& z){return std::min(z[0],z[1]);}, {f0, f1});}
 template<int NDim> auto max(const Function<NDim>& f0, const Function<NDim>& f1) { return Function<NDim>([](const std::vector<Real>& z){return std::max(z[0],z[1]);}, {f0, f1});}
-template<int NDim> auto max(const Function<NDim>& f0, double val) { return Function<NDim>([val](const Real z){return std::max(z,val);}, f0);}
-template<int NDim> auto max(double val, const Function<NDim>& f0) { return Function<NDim>([val](const Real z){return std::max(z,val);}, f0);}
-template<int NDim> auto min(const Function<NDim>& f0, double val) { return Function<NDim>([val](const Real z){return std::min(z,val);}, f0);}
-template<int NDim> auto min(double val, const Function<NDim>& f0) { return Function<NDim>([val](const Real z){return std::min(z,val);}, f0);}
+template<int NDim> auto max(const Function<NDim>& f0, Real val) { return Function<NDim>([val](const Real z){return std::max(z,val);}, f0);}
+template<int NDim> auto max(Real val, const Function<NDim>& f0) { return Function<NDim>([val](const Real z){return std::max(z,val);}, f0);}
+template<int NDim> auto min(const Function<NDim>& f0, Real val) { return Function<NDim>([val](const Real z){return std::min(z,val);}, f0);}
+template<int NDim> auto min(Real val, const Function<NDim>& f0) { return Function<NDim>([val](const Real z){return std::min(z,val);}, f0);}
 
 //=======================================================
 // Implementation Details
@@ -345,15 +369,32 @@ template<int NDim> auto Function<NDim>::elementVec(const int t_elementID) {
 }
 
 
-template<> const inline LinTransform<1> Function<1>::fromModalToLinFormTransf ({{1.,0.},{std::sqrt(3.), -2.*std::sqrt(3.)}});
-template<> const inline LinTransform<1> Function<1>::fromLinFormToModalTransf (Function<1>::fromModalToLinFormTransf.inverse());
+template<> const inline GeometryCore::LinTransform<1> Function<1>::fromModalToLinFormTransf = [](){
+    GeometryCore::LinTransform<1> tmp ;
+    tmp << 1.,0. , std::sqrt(3.), -2.*std::sqrt(3.);
+    return tmp;
+}();
+// ({{1.,0.},{std::sqrt(3.), -2.*std::sqrt(3.)}});
+template<> const inline GeometryCore::LinTransform<1> Function<1>::fromLinFormToModalTransf (Function<1>::fromModalToLinFormTransf.inverse());
 
-template<> const inline LinTransform<2> Function<2>::fromModalToLinFormTransf ({{std::sqrt(2.),0.,0.},{2., -6., 0.},{2., 0., -6.}});
-template<> const inline LinTransform<2> Function<2>::fromLinFormToModalTransf (Function<2>::fromModalToLinFormTransf.inverse());
+template<> const inline GeometryCore::LinTransform<2> Function<2>::fromModalToLinFormTransf = [](){
+    GeometryCore::LinTransform<2> tmp ;
+    tmp << std::sqrt(2.),0.,0. ,2., -6., 0.,2., 0., -6. ;
+    return tmp;
+}();
+ //({{std::sqrt(2.),0.,0.},{2., -6., 0.},{2., 0., -6.}});
+template<> const inline GeometryCore::LinTransform<2> Function<2>::fromLinFormToModalTransf (Function<2>::fromModalToLinFormTransf.inverse());
 
-template<> const inline LinTransform<3> Function<3>::fromModalToLinFormTransf ({{std::sqrt(2.), 0., 0. ,0.},{std::sqrt(10.), -4.*std::sqrt(10.), 0., 0.},
-    {std::sqrt(10.), 0., -4.*std::sqrt(10.), 0.},{std::sqrt(10.), 0., 0., -4.*std::sqrt(10.)}});
-template<> const inline LinTransform<3> Function<3>::fromLinFormToModalTransf (Function<3>::fromModalToLinFormTransf.inverse());
+template<> const inline GeometryCore::LinTransform<3> Function<3>::fromModalToLinFormTransf 
+= [](){
+    GeometryCore::LinTransform<3> tmp ;
+    tmp << std::sqrt(2.), 0., 0. ,0., std::sqrt(10.), -4.*std::sqrt(10.), 0., 0.,
+   std::sqrt(10.), 0., -4.*std::sqrt(10.), 0., std::sqrt(10.), 0., 0., -4.*std::sqrt(10.);
+    return tmp;
+}();
+ //({{std::sqrt(2.), 0., 0. ,0.},{std::sqrt(10.), -4.*std::sqrt(10.), 0., 0.},
+ //   {std::sqrt(10.), 0., -4.*std::sqrt(10.), 0.},{std::sqrt(10.), 0., 0., -4.*std::sqrt(10.)}});
+template<> const inline GeometryCore::LinTransform<3> Function<3>::fromLinFormToModalTransf (Function<3>::fromModalToLinFormTransf.inverse());
 
 
 template<int NDim>

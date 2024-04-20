@@ -60,8 +60,8 @@ template <int NDim> using Vect_Points               = std::vector<Eigen::Matrix<
 template<int NDim> class Region {         // NDim = Number of Dimensions of the space
 public:
     // Geometric Attributes
-    const Point<NDim>                               origin;                                 // origin of the Region
-    const ArrayPoint<NDim,NDim>                     gVec;                                   // Region sides vectors
+    Point<NDim> const                               origin;                                 // origin of the Region
+    ArrayPoint<NDim,NDim> const                     gVec;                                   // Region sides vectors
     
 public:
     //=======================================================
@@ -72,7 +72,8 @@ public:
     Region(const Point<NDim>& t_origin, const Vect_Points<NDim>& t_gVec);
     Region(const Real t_origin, const Real t_gVec) requires (NDim==1);
     
-    Region(const std::string &FileName);  // Constructs a region reading the data from file. The file must be built with the method writeToTxtFile declared below
+    Region(const std::string &FileName);    // Constructs a region reading the data from file. The file must be built with the method writeToTxtFile declared below
+//    Region(std::ostream &t_os);             // Constructs a region from an open stream
     //===================
     
     template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& nodevalue){
@@ -98,6 +99,7 @@ public:
     //===================
     void plot(const std::string& t_title = "") const;
     void writeToTxtFile(const std::string &FileName) const;
+//    friend std::ostream &operator<<(std::ostream &t_os, Region<NDim> const& t_region);
     
 public:
     //=======================================================

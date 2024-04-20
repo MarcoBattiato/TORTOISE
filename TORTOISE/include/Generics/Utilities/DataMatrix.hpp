@@ -52,6 +52,8 @@
 
 namespace Tortoise {
 
+namespace Utilities {
+
 class DataColumn: public std::vector<double>{
 public:
     using std::vector<double>::operator=;
@@ -62,7 +64,7 @@ public:
     };
 };
 
-class DataMatrix: public StringMap<DataColumn>{
+class DataMatrix: public Containers::StringMap<DataColumn>{
 public:
     DataMatrix(const std::vector<std::string>& colNames) {
         for (auto col: colNames){ emplace_back(col, DataColumn()); }
@@ -126,6 +128,8 @@ public:
         myfile.close();
     }
 };
+
+} // namespace Utilities
 
 } // namespace Tortoise
 

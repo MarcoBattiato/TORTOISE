@@ -41,7 +41,7 @@
 
 // #define NDEBUG            // Uncomment to deactivate debug mode
 
-#include <TORTOISE>
+#include "DiscretizationCore.hpp"
 #include <iostream>
 #include <functional>
 
@@ -80,13 +80,13 @@ int main(int argc, const char * argv[]) {
     // There are more advanced constructor
     
     // This construct a new discretised function as the result of some expression of another discretised function
-    Function<2> funct4([](realValueType z){return 1./z;}, funct2);
+    Function<2> funct4([](Real z){return 1./z;}, funct2);
     Function<2> funct4_1(1./x, funct2);
     // Notice nhow it is not necessary to pass a mesh, since this constructor creates a function object on the same
     // mesh of funct2, and initialises it to 1/funct2(x,y)
     
     // As a function of more variables
-    Function<2> funct5([](std::vector<realValueType> z){return 1./z[0] + 3.*z[0]*z[1];}, {funct2, funct3});
+    Function<2> funct5([](std::vector<Real> z){return 1./z[0] + 3.*z[0]*z[1];}, {funct2, funct3});
     // Creates a function object on the same mesh of funct2, and initialises it to 1/funct2(x,y) + funct2(x,y) * funct3(x,y)
     // Notice that if funct2 and funct3 are defined on different meshes, the constructor will return an error
     Function<2> funct5_1(1./x + 3.* x * y, {funct2, funct3});

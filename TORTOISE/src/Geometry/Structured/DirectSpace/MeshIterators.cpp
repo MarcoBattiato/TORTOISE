@@ -50,7 +50,8 @@ namespace Tortoise {
 //template<int NDim> SectionIterator<NDim>::SectionIterator(const Mesh<NDim>* mesh): SectionIterator(*mesh){};
 
 // Explicit constructor
-template<int NDim> SectionIterator<NDim>::SectionIterator(const CartIndex<NDim> t_maxcoord, const CartIndex<NDim> t_lcoord, const CartIndex<NDim> t_hcoord): maxcoord(t_maxcoord), lcoord(t_lcoord), hcoord(t_hcoord), currentcoord(t_lcoord), unfinished((t_lcoord.array() != t_hcoord.array()).all())
+template<int NDim> SectionIterator<NDim>::SectionIterator(const CartIndex<NDim> t_maxcoord, const CartIndex<NDim> t_lcoord, const CartIndex<NDim> t_hcoord)
+: maxcoord(t_maxcoord), lcoord(t_lcoord), hcoord(t_hcoord), currentcoord(t_lcoord), unfinished((t_lcoord.array() != t_hcoord.array()).all())
 {
     assert( (lcoord.array() >= 0).all() && (lcoord.array() <= maxcoord.array()).all());
     assert( (hcoord.array() >= 0).all() && (lcoord.array() <= maxcoord.array()).all());

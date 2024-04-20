@@ -38,6 +38,8 @@
 
 #include <cassert>
 
+using namespace Tortoise::GeometryCore;
+
 namespace Tortoise {
 
 // Output for EigenMatrix types

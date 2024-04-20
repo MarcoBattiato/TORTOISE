@@ -28,23 +28,30 @@
 // https://github.com/MarcoBattiato/TORTOISE
 //
 //
-//  AnalyticFunction.cpp
+//  GradientDescent.hpp
 //  TORTOISE
 //
-//  Created by Marco Battiato on 22/9/21.
+//  Created by Marco Battiato on 4/4/23.
 //
 
-#include <Geometry/GeometryCore/AnalyticFunction.hpp>
+#ifndef GradientDescent_hpp
+#define GradientDescent_hpp
 
 namespace Tortoise {
 
+namespace Algorithms {
 
-AnalyticFunctionCoordinate x(0);
-AnalyticFunctionCoordinate y(1);
-AnalyticFunctionCoordinate z(2);
-AnalyticFunctionPoint      k;
-AnalyticFunctionCoordinate kx(0);
-AnalyticFunctionCoordinate ky(1);
-AnalyticFunctionCoordinate kz(2);
+template <typename FunctToOptimType, typename GradientFunctToOptimType, typename PointType> PointType gradientDescent
+(FunctToOptimType               funcToOptim,
+ GradientFunctToOptimType       gradientFunc,
+ 
+ 
+ )
+
+
+} // namespace Algorithms
 
 } // namespace Tortoise
+
+
+#endif /* GradientDescent_hpp */

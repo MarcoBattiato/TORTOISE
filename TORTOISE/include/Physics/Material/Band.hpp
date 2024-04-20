@@ -58,13 +58,13 @@ public:
 // Scalar attributes
     Real                                    charge;             // Stores the value of the charge and the multiplier for the statistic
     Real                                    statistics;         // Stores the value of the multiplier for the statistic
-    StringMap<Real>                         attribute;          // Used to store user-defined scalar attributes.
+    Containers::StringMap<Real>             attribute;          // Used to store user-defined scalar attributes.
     
 // Function attributes
     Function<NDim>                          dispersion;         // Stores the dispersion
     Function<NDim>                          densityOfStates;    // Stores the density of states (at this stage a simple constant function)
     std::array<Function<NDim>,NDim>         crystalMomentum;    // Stores the crystal momentum (at this stage a simple f(k)=kx )
-    StringMap<Function<NDim>>               functionAttribute;  // Used to store attributes that are functions (for instance spin polarisation)
+    Containers::StringMap<Function<NDim>>   functionAttribute;  // Used to store attributes that are functions (for instance spin polarisation)
     
 // Time propagation properties
     bool                                    constrained = false;// If constrained, it means that the population in the band should not be allowed to propagate, but should have a value fixed by the user
@@ -74,9 +74,12 @@ public:
     std::function<Function<NDim>(Real)>     constrainedPopulation; // Function of time that gives the population at the specified time
     
 // Parameters for error calculation in adaptive time step time propagation
-    Real                                    absoluteErrorTolerance = 1.e-2;         // Used in adaptive time step: acceptable absolute error in population for this band
-    Real                                    relativeErrorTolerance = 1.e-2;         // Used in adaptive time step: acceptable relative error in population as fraction of population for this band
-    Real                                    penalisationUnphysicalPopulation = 1.;  // Amplification factor of contribution to error due to appearence of unphysical population for this band
+    Real                                    absoluteErrorTolerance = 1.e-3;         // Used in adaptive time step: acceptable absolute error in population for this band
+    Real                                    relativeErrorTolerance = 1.e-3;         // Used in adaptive time step: acceptable relative error in population as fraction of population for this band
+    // It is discouraged to set too high tolerances. Given the high order of convergence of the used time stepping methods, the savings
+    // when setting high tolerances are usually marginal, yet high tolerances can lead to accepted errors that can be even higher than
+    // the population in the bands.
+    Real                                    penalisationUnphysicalPopulation = 0.;  // Amplification factor of contribution to error due to appearence of unphysical population for this band
                                                                                     // A population is unphysical if <0.0 and >1.0 for fermions, or if <0.0 for bosons
     
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

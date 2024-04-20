@@ -82,7 +82,7 @@
 // MiscUtilities.hpp is a collaction of utilities that I programmed and turned out useful for a number of uses of TORTOISE. We will see later what is provided.
 
 
-#include <TORTOISE>
+#include "DiscretizationCore.hpp"
 #include <iostream>
 
 // All the classes in TORTOISE are within the namespace Totroise. Therefore all classes and objects within TORTOISE need to be called with Tortoise::name_of_class
@@ -101,22 +101,22 @@ int main(int argc, const char * argv[]) {
     // First we learn few fundamental functionalities offered by "Geometry.hpp"
     
     // ************************************************************
-    // The type alias: real (Geometry.hpp)
+    // The type alias: Real (Geometry.hpp)
     // ************************************************************
 
     // The whole library is built in a way that it is easy to change the precision of the used real numbers.
-    // Instead of explicitly using float or double, etc, the user should use the type alias: real
-    // In the version this tutorial was written for, real = double
+    // Instead of explicitly using float or double, etc, the user should use the type alias: Real
+    // In the version this tutorial was written for, Real = double
     // However in a later version the precision might be decreased or increased.
 
     // Do not use
     // double myValue = 1.35;
     // Use instead
-    real myValue = 1.35;
+    Real myValue = 1.35;
 
     // This will ensure that all the numbers within TORTOISE have the same precision
     
-    // If for whatever reason you want to change the type aliased by real
+    // If for whatever reason you want to change the type aliased by Real
     // modify file Geometry/GeometryCore/Geometry.hpp  line 111
     // Notice that this change will automatically propagate everywhere in TORTOISE.
     // This is a very convenient way of changing precision everywhere by changing a single line.

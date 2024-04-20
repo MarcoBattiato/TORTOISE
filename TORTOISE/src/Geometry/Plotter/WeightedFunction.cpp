@@ -37,8 +37,9 @@
 #include <Geometry/Plotter/WeightedFunction.hpp>
 #include <Generics/Utilities/StringUtilities.hpp>
 
-namespace Tortoise {
+using namespace Tortoise::GeometryCore;
 
+namespace Tortoise {
 
 template< typename T >
 std::string int_to_hex( T i )

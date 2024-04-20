@@ -41,7 +41,7 @@
 
 // #define NDEBUG            // Uncomment to deactivate debug mode
 
-#include <TORTOISE>
+#include "DiscretizationCore.hpp"
 #include <iostream>
 
 using namespace Tortoise;
@@ -100,7 +100,9 @@ int main(int argc, const char * argv[]) {
 
     // To plot a line let us create a vector of Points (an array of points would work in the same way).
     
-    VectorPoint<3> exmplPointVector3D {{1.2,  1.5,  1.,  1.5},{-2.5, -0.5, 0.5, -0.5},{0., 1.,  2., 3.}};
+    VectorPoint<3> exmplPointVector3D { {1.2,  1.5,  1.,  1.5},
+                                        {-2.5, -0.5, 0.5, -0.5},
+                                        {0., 1.,  2., 3.}};
     // When the vector of points is sent to plotter3d via the << operator, plotter3d reads the cartesian components and
     // starts producing the input for GNUPlot
     plotter3d << exmplPointVector3D ;
@@ -134,7 +136,7 @@ int main(int argc, const char * argv[]) {
 
     // We can add another line.
     VectorPoint<3> exmplPointVector3D_other {{0.2,  0.5,  0.,  0.5, 0.3},{-2.5, -0.5, 0.5, -0.5, 1.2},{0., 1.,  2., 3., 3.}};
-    plotter3d << exmplPointVector3D_other << LABEL("line 2") << COLOR("blue") ;
+    plotter3d << exmplPointVector3D_other << LABEL("line 2") << COLOR("blue");
     
     // Like this we are adding a second line to the plot.
     // plotter3d, noticing that a new graphical onbject is being passed, will finilise the GNUPlot input for the previous graphical object

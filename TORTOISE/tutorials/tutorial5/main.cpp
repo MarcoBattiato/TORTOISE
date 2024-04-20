@@ -45,7 +45,7 @@ using std::cout;
 int main(int argc, const char * argv[]) {
     
     // Let us build the material
-    real                pi = 3.1415;
+    Real                pi = 3.1415;
     Point<2>            originBZ({0.0, 0.}), sideBZ0({1.0, 0.0}), sideBZ1({-.5, std::sqrt(3.0)/2});
     Point<2>            ortsideBZ0({.0, 1.0}), ortsideBZ1({std::sqrt(3.0)/2, .5});
     Region<2>           brillouinZone (originBZ,{sideBZ0,sideBZ1});
@@ -57,7 +57,7 @@ int main(int argc, const char * argv[]) {
     Mesh<2>             meshB(brillouinZone, {0.6,0.6},{0.3,0.3},{resolution,resolution});
     Mesh<2>             meshPhot(brillouinZone, {0.,0.},{0.001,0.0001},{5*resolution,1});
     
-    real                photMaxEnergy = 2.5;
+    Real                photMaxEnergy = 2.5;
     
     exMat.addBand("pn:ac0", 0, boson, meshFull, 0.05);
     exMat.addBand("el:V_A", -1, fermion, meshA, -1.1+sin(pi*dot(ortsideBZ0,k - 0.101*sideBZ0 - 0.1*sideBZ1)/(0.3*std::sqrt(3.0)/2))*sin(pi*dot(ortsideBZ1,k- 0.101*sideBZ0 - 0.1*sideBZ1)/(0.3*std::sqrt(3.0)/2)));
@@ -73,7 +73,7 @@ int main(int argc, const char * argv[]) {
 
     
     MaterialStatus<2>   equil(exMat);
-    const real chemPot = 0.0, temp = 0.1;
+    const Real chemPot = 0.0, temp = 0.1;
     for (auto band: exMat.matchListId("*")){
         if(exMat[band].statistics == fermion)
             equil[band] = 1/(exp((exMat[band].dispersion-chemPot)/temp)+1);
@@ -95,11 +95,11 @@ int main(int argc, const char * argv[]) {
     // In this case the population will be a gaussian in momentum around the desired central laser frequency and with the appropriate
     // laser energy width
     // The dependence on time will be a gaussian as well
-    exMat["pt:Lin"].constrainedPopulation = [&exMat](real t){return 1.e7*std::exp(-std::pow(t-0.3,2.)/0.1)*exp(-pow(exMat["pt:Lin"].dispersion-1.4,2)/0.04);};
+    exMat["pt:Lin"].constrainedPopulation = [&exMat](Real t){return 1.e7*std::exp(-std::pow(t-0.3,2.)/0.1)*exp(-pow(exMat["pt:Lin"].dispersion-1.4,2)/0.04);};
     
     // The time evolution is calculated in the same way. TORTOISE will see that one of the bands is constrained and act accordingly
     stopWatch.tic();
-    evolution.propagateDeterministic(5, 1.);
+    evolution.propagateDeterministic(5., 1.);
     cout << "Time taken for time propagation: " << stopWatch.toc() << "s\n";
     
     for (auto elBand : exMat.matchListId("el:*")){

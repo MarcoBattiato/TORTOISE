@@ -36,7 +36,8 @@
 
 #include <Physics/Status/MaterialTimeStatus.hpp>
 #include <Generics/Algorithms/DormandPrince54.hpp>
-
+#include <vector>
+#include <cassert>
 
 namespace Tortoise {
 // Explicit template instantiation (For more info see: https://isocpp.org/wiki/faq/templates#templates-defn-vs-decl)
@@ -44,10 +45,10 @@ namespace Tortoise {
 //=======================================================
 // Constructors
 //===================
-template<int NDim> MaterialTimeStatus<NDim>::MaterialTimeStatus(const Material<NDim> &Materialpass):
-UnivariateRelationContainer<std::deque<Real>, std::deque<MaterialStatus<NDim>>>(std::deque<Real>{}, std::deque<MaterialStatus<NDim>>{}), material(&Materialpass){}
+template<int NDim> MaterialTimeStatus<NDim>::MaterialTimeStatus(Material<NDim> & Materialpass):
+Containers::UnivariateRelationContainer<std::deque<Real>, std::deque<MaterialStatus<NDim>>>(std::deque<Real>{}, std::deque<MaterialStatus<NDim>>{}), material(&Materialpass){}
 template<int NDim> MaterialTimeStatus<NDim>::MaterialTimeStatus(Real time0, const MaterialStatus<NDim>& matStatus0):
-UnivariateRelationContainer<std::deque<Real>, std::deque<MaterialStatus<NDim>>>(time0, matStatus0), material(matStatus0.material){}
+Containers::UnivariateRelationContainer<std::deque<Real>, std::deque<MaterialStatus<NDim>>>(time0, matStatus0), material(matStatus0.material){}
 template<int NDim> MaterialTimeStatus<NDim>::MaterialTimeStatus(const MaterialStatus<NDim>& matStatus0):
 MaterialTimeStatus(0.0, matStatus0){}
 
@@ -56,8 +57,53 @@ MaterialTimeStatus(0.0, matStatus0){}
 // Propagations
 //********************************
 
-template<int NDim> void MaterialTimeStatus<NDim>::propagateDeterministic(double finalTime, double denseStep){
-    dormandPrince54(
+template <int NDim> Real MaterialTimeStatus<NDim>::timeStepVetoer(std::vector<Real> timesToTest, Real denseStep) const {
+    assert(timesToTest.size() > 1);
+    
+    const Real acceptableRelativeVariation = 0.3;
+    
+    Real cryticalTime = timesToTest.back();
+    bool foundCrytical = false ;
+    
+    for (int bandN = 0, endB = (*material).size(); bandN < endB; ++bandN){
+        if ( (*material)[bandN].constrained){
+            
+            Real currentTestedTime = timesToTest[0] + denseStep;
+            Function<NDim> valueLeft ((*material)[bandN].constrainedPopulation(timesToTest[0]) );
+            Function<NDim> valueRight ((*material)[bandN].constrainedPopulation(timesToTest[1]) );
+
+            for (int i = 0, end = timesToTest.size() - 1; i < end; ++i){
+                if (i !=0 ){
+                    valueLeft = valueRight;
+                    valueRight = (*material)[bandN].constrainedPopulation(timesToTest[i+1]);
+                }
+                const Function<NDim> intervalAverage = 0.5 * ( valueLeft + valueRight);
+                const Function<NDim> acceptedVariation = (1. + acceptableRelativeVariation) * fabs( valueLeft - valueRight) + (*material)[bandN].absoluteErrorTolerance + (*material)[bandN].relativeErrorTolerance * fabs(intervalAverage);
+                
+                while ( currentTestedTime < timesToTest[i+1] ){
+                    const Function<NDim> valueIntermediateTime = (*material)[bandN].constrainedPopulation(currentTestedTime);
+                    const Real maxRelativeVariation = (fabs(valueIntermediateTime - intervalAverage) / acceptedVariation).max();
+                    if ( maxRelativeVariation > 1.){
+                        cryticalTime = currentTestedTime;
+                        foundCrytical = true;
+                        break;
+                    }
+                    currentTestedTime += denseStep;
+                }
+                if ( foundCrytical ) break;
+            }
+        }
+        if ( foundCrytical ) break;
+    }
+    
+    return cryticalTime - timesToTest[0];
+}
+
+template<int NDim> void MaterialTimeStatus<NDim>::propagate(Real finalTime, Real denseStep){
+    
+    material->constructMCPoints();
+    
+    Algorithms::dormandPrince54(
                     // input/output
                     *this,
                     // end time of propagation
@@ -67,7 +113,7 @@ template<int NDim> void MaterialTimeStatus<NDim>::propagateDeterministic(double 
                     // operator that gives the derivative
                     // It must be >   timeOp(ContainerType::ArgType currentTime, ContainerType::ValType currentY) -> ContainerType::ValType
                     [](Real t, const MaterialStatus<NDim>& status){
-                        return status.propagateDeterministic();
+                        return status.propagate();
                     },
                     // Function that modifies the value of the solution to enforce certain constraints
                     // it must be >   enforceValue(ContainerType::ArgType currentTime, const ContainerType::ValType& currentY) -> ContainerType::ValType
@@ -78,13 +124,17 @@ template<int NDim> void MaterialTimeStatus<NDim>::propagateDeterministic(double 
                     // It must be >    normErrorForm(ContainerType::ValType localErrY, ContainerType::ValType currentY) -> ContainerType::ArgType
                     [](const MaterialStatus<NDim>& error, const MaterialStatus<NDim>& currentY){
                         return error.relativeError(currentY);
-                    },// Defines some output operations
+                    },
+                    // Defines some output operations
                     // It must be in the form >     outputFunct(ContainerType::ArgType currentTime, ContainerType::ValType currentY)
-                    [](Real t, const MaterialStatus<NDim>& currentY){}
+                    [](Real t, const MaterialStatus<NDim>& currentY){} ,
+                    // Defines the step vetter
+                    // It must be in the form >     timeStepVetoer(std::vector<ContainerType::ArgType> timesToTest, ContainerType::ArgType denseStep) -> ContainerType::ArgType maxAllowedStep
+                    [this](std::vector<Real> timesToTest, Real denseStep){
+                        return this->timeStepVetoer(timesToTest,denseStep);
+                    }
                     );
 };
-
-
 
 
 template class MaterialTimeStatus<1>;

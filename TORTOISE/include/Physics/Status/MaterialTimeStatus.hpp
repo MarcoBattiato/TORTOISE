@@ -53,7 +53,7 @@ template<int NDim> class MaterialTimeStatus :
 //~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~
 public
-UnivariateRelationContainer<
+Containers::UnivariateRelationContainer<
     std::deque<Real>,              // Times
     std::deque<MaterialStatus<NDim>>        // MaterialStatus<NDim> containing the populations at different times
 >
@@ -65,7 +65,7 @@ UnivariateRelationContainer<
 //~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~
 public:
-    const Material<NDim> *          material;       // Pointer to the material the populations refer to
+    Material<NDim>* const          material;       // Pointer to the material the populations refer to
     
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,7 +76,7 @@ public:
     //=======================================================
     // Constructors
     //===================
-    explicit MaterialTimeStatus(const Material<NDim> &Materialpass);
+    explicit MaterialTimeStatus(Material<NDim> &Materialpass);
     explicit MaterialTimeStatus(const MaterialStatus<NDim>& matStatus0); // Assumes that initial time is 0.
     MaterialTimeStatus(Real time0, const MaterialStatus<NDim>& matStatus0);
 
@@ -85,9 +85,11 @@ public:
     // Propagations
     //********************************
     
-    void propagateDeterministic(double finalTime, double denseStep);    // Propagates with adaptive DP5(4)
+    void propagate(Real finalTime, Real denseStep);    // Propagates with adaptive DP5(4)
     
     MaterialTimeStatus(const Material<NDim>&& Materialpass) = delete;
+    
+    Real timeStepVetoer(std::vector<Real> timesToTest, Real denseStep) const;
 };
     
     

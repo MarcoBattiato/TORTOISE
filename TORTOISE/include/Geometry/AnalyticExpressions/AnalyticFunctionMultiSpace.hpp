@@ -28,79 +28,81 @@
 // https://github.com/MarcoBattiato/TORTOISE
 //
 //
-//  AnalyticFunction.hpp
+//  AnalyticFunctionMultiSpace.hpp
 //  TORTOISE
 //
-//  Created by Marco Battiato on 22/9/21.
+//  Created by Marco Battiato on 24/9/21.
 //
-//  This class uses expression templates on functors to provide some functionalities to express and use analytic functions
 
-#ifndef AnalyticFunction_hpp
-#define AnalyticFunction_hpp
+#ifndef AnalyticFunctionMultiSpace_hpp
+#define AnalyticFunctionMultiSpace_hpp
 
 #include <Geometry/GeometryCore/Geometry.hpp>
 
 #include <cassert>
 #include <vector>
-
+#include <iostream>
 
 namespace Tortoise {
+
 
 // ============
 // AnalyticFunction base class
 // ============
-template <typename AnFunc> class AnalyticFunction{
+template <typename AnFunc> class AnalyticFunctionMultiSpace{
 public:
-    template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& variable) const {
-        return static_cast<AnFunc const&>(*this)(variable);
+    template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
+        return static_cast<AnFunc const&>(*this)(arrayOfPoints);
     }
 };
 
 // ============
 // Most atomic analytic functions
 // ============
-class AnalyticFunctionPoint : public AnalyticFunction<AnalyticFunctionPoint> {
+class AnalyticFunctionMultiSpacePoint : public AnalyticFunctionMultiSpace<AnalyticFunctionMultiSpacePoint> {
+    const int _which;  // which point
 public:
-//    template<typename Derived> Point<Derived::RowsAtCompileTime> operator()(const Eigen::MatrixBase<Derived>& variable) const {
-//        return variable;
-//    }
-    template<typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& variable) const {
-        return variable.col(0);
+    AnalyticFunctionMultiSpacePoint(int which): _which(which){}
+    template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
+        std::cout << ">" << _which << "<";
+        return arrayOfPoints.col(_which);
     }
 };
-class AnalyticFunctionCoordinate : public AnalyticFunction<AnalyticFunctionCoordinate> {
+class AnalyticFunctionMultiSpacePointCoordinate : public AnalyticFunctionMultiSpace<AnalyticFunctionMultiSpacePointCoordinate> {
+    const int _which;  // which point
     const int _dir;    // direction
 public:
-    AnalyticFunctionCoordinate(int dir): _dir(dir){}
+    AnalyticFunctionMultiSpacePointCoordinate(int which, int dir): _which(which), _dir(dir){}
     template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
-        return arrayOfPoints(_dir);
+        return arrayOfPoints(_dir,_which);
     }
 };
+
 
 // ============
 // Unary Operations
 // ============
-template <typename AnFunc> class AnalyticFunctionNegative :
-public AnalyticFunction<AnalyticFunctionNegative<AnFunc>> {
+template <typename AnFunc> class AnalyticFunctionMultiSpaceNegative :
+public AnalyticFunctionMultiSpace<AnalyticFunctionMultiSpaceNegative<AnFunc>> {
     const AnFunc& _u;
 public:
-    AnalyticFunctionNegative(const AnFunc& u): _u(u){}
+    AnalyticFunctionMultiSpaceNegative(const AnFunc& u): _u(u){}
     template <typename Derived> auto
     operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
         return -_u(arrayOfPoints);
     }
 };
-template <typename AnFunc> AnalyticFunctionNegative<AnFunc>
-operator-(const AnalyticFunction<AnFunc>& u) {
-   return AnalyticFunctionNegative<AnFunc>(*static_cast<const AnFunc*>(&u));
+template <typename AnFunc> AnalyticFunctionMultiSpaceNegative<AnFunc>
+operator-(const AnalyticFunctionMultiSpace<AnFunc>& u) {
+   return AnalyticFunctionMultiSpaceNegative<AnFunc>(*static_cast<const AnFunc*>(&u));
 }
 
 // ============
 // Binary Operations
 // ============
-#define ANALYTICFUNCTION_OPERATOR_OVERLOAD(_NAME_CLASS_,_OPER_)                         \
+#define ANALYTICFUNCTIONMULTISPACE_OPERATOR_OVERLOAD(_NAME_CLASS_,_OPER_)               \
 template <typename AnFunc1, typename AnFunc2> class _NAME_CLASS_ :                      \
-public AnalyticFunction<_NAME_CLASS_<AnFunc1,AnFunc2>> {                                \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_<AnFunc1,AnFunc2>> {                      \
     const AnFunc1& _u;                                                                  \
     const AnFunc2& _v;                                                                  \
 public:                                                                                 \
@@ -111,23 +113,23 @@ public:                                                                         
     }                                                                                   \
 };                                                                                      \
 template <typename AnFunc1, typename AnFunc2> _NAME_CLASS_<AnFunc1, AnFunc2>            \
-operator _OPER_(const AnalyticFunction<AnFunc1>& u,                                     \
-            const AnalyticFunction<AnFunc2>& v) {                                       \
+operator _OPER_(const AnalyticFunctionMultiSpace<AnFunc1>& u,                           \
+            const AnalyticFunctionMultiSpace<AnFunc2>& v) {                             \
    return _NAME_CLASS_<AnFunc1, AnFunc2>(*static_cast<const AnFunc1*>(&u),              \
                                          *static_cast<const AnFunc2*>(&v));             \
 }
 
-ANALYTICFUNCTION_OPERATOR_OVERLOAD(AnalyticFunctionSum, +)
-ANALYTICFUNCTION_OPERATOR_OVERLOAD(AnalyticFunctionSub, -)
-ANALYTICFUNCTION_OPERATOR_OVERLOAD(AnalyticFunctionMult,*)
-ANALYTICFUNCTION_OPERATOR_OVERLOAD(AnalyticFunctionDiv, /)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_OVERLOAD(AnalyticFunctionMultiSpaceSum, +)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_OVERLOAD(AnalyticFunctionMultiSpaceSub, -)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_OVERLOAD(AnalyticFunctionMultiSpaceMult,*)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_OVERLOAD(AnalyticFunctionMultiSpaceDiv, /)
 
 // ============
 // Operations with scalars (symmetric)
 // ============
-#define ANALYTICFUNCTION_OPERATOR_SCALAR_OVERLOAD(_NAME_CLASS_,_OPER_)                  \
+#define ANALYTICFUNCTIONMULTISPACE_OPERATOR_SCALAR_OVERLOAD(_NAME_CLASS_,_OPER_)        \
 template <typename AnFunc> class _NAME_CLASS_ :                                         \
-public AnalyticFunction<_NAME_CLASS_<AnFunc>> {                                         \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_<AnFunc>> {                               \
     const AnFunc& _u;                                                                   \
     const Real _v;                                                             \
 public:                                                                                 \
@@ -138,25 +140,25 @@ public:                                                                         
     }                                                                                   \
 };                                                                                      \
 template <typename AnFunc> _NAME_CLASS_<AnFunc>                                         \
-operator _OPER_(const AnalyticFunction<AnFunc>& u,                            \
+operator _OPER_(const AnalyticFunctionMultiSpace<AnFunc>& u,                            \
                 const Real v) {                                                \
    return _NAME_CLASS_<AnFunc>(*static_cast<const AnFunc*>(&u), v);                     \
 }                                                                                       \
 template <typename AnFunc> _NAME_CLASS_<AnFunc>                                         \
 operator _OPER_(const Real v,                                                  \
-                const AnalyticFunction<AnFunc>& u) {                          \
+                const AnalyticFunctionMultiSpace<AnFunc>& u) {                          \
    return _NAME_CLASS_<AnFunc>(*static_cast<const AnFunc*>(&u), v);                     \
 }
 
-ANALYTICFUNCTION_OPERATOR_SCALAR_OVERLOAD(AnalyticFunctionSumScal,+)
-ANALYTICFUNCTION_OPERATOR_SCALAR_OVERLOAD(AnalyticFunctionMultScal,*)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_SCALAR_OVERLOAD(AnalyticFunctionMultiSpaceSumScal,+)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_SCALAR_OVERLOAD(AnalyticFunctionMultiSpaceMultScal,*)
 
 // ============
 // Operations with scalars (asymmetric)
 // ============
-#define ANALYTICFUNCTION_OPERATOR_SCALARASYMMETRIC_OVERLOAD(_NAME_CLASS_,_OPER_)        \
+#define ANALYTICFUNCTIONMULTISPACE_OPERATOR_SCALARASYMMETRIC_OVERLOAD(_NAME_CLASS_,_OPER_)  \
 template <typename AnFunc> class _NAME_CLASS_ :                                         \
-public AnalyticFunction<_NAME_CLASS_<AnFunc>> {                                         \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_<AnFunc>> {                               \
     const AnFunc& _u;                                                                   \
     const Real _v;                                                             \
 public:                                                                                 \
@@ -167,12 +169,12 @@ public:                                                                         
     }                                                                                   \
 };                                                                                      \
 template <typename AnFunc> _NAME_CLASS_<AnFunc>                                         \
-operator _OPER_(const AnalyticFunction<AnFunc>& u,                                      \
+operator _OPER_(const AnalyticFunctionMultiSpace<AnFunc>& u,                            \
                 const Real v) {                                                \
    return _NAME_CLASS_<AnFunc>(*static_cast<const AnFunc*>(&u), v);                     \
 }                                                                                       \
 template <typename AnFunc> class _NAME_CLASS_ ## 1 :                                    \
-public AnalyticFunction<_NAME_CLASS_ ## 1<AnFunc>> {                                    \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_ ## 1<AnFunc>> {                          \
     const AnFunc& _u;                                                                   \
     const Real _v;                                                             \
 public:                                                                                 \
@@ -184,19 +186,19 @@ public:                                                                         
 };                                                                                      \
 template <typename AnFunc> _NAME_CLASS_ ## 1<AnFunc>                                    \
 operator _OPER_(const Real v,                                                  \
-                const AnalyticFunction<AnFunc>& u) {                                    \
+                const AnalyticFunctionMultiSpace<AnFunc>& u) {                          \
    return _NAME_CLASS_ ## 1<AnFunc>(*static_cast<const AnFunc*>(&u), v);                \
 }
 
-ANALYTICFUNCTION_OPERATOR_SCALARASYMMETRIC_OVERLOAD(AnalyticFunctionSubScal,-)
-ANALYTICFUNCTION_OPERATOR_SCALARASYMMETRIC_OVERLOAD(AnalyticFunctionDivScal,/)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_SCALARASYMMETRIC_OVERLOAD(AnalyticFunctionMultiSpaceSubScal,-)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_SCALARASYMMETRIC_OVERLOAD(AnalyticFunctionMultiSpaceDivScal,/)
 
 // ============
 // Operations with vectors (symmetric)
 // ============
-#define ANALYTICFUNCTION_OPERATOR_VECTOR_OVERLOAD(_NAME_CLASS_,_OPER_)                  \
+#define ANALYTICFUNCTIONMULTISPACE_OPERATOR_VECTOR_OVERLOAD(_NAME_CLASS_,_OPER_)        \
 template <typename AnFunc> class _NAME_CLASS_ :                                         \
-public AnalyticFunction<_NAME_CLASS_<AnFunc>> {                                         \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_<AnFunc>> {                               \
     const AnFunc& _u;                                                                   \
     const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> _v;              \
 public:                                                                                 \
@@ -208,25 +210,25 @@ public:                                                                         
     }                                                                                   \
 };                                                                                      \
 template <typename AnFunc, typename Derived> _NAME_CLASS_<AnFunc>                       \
-    operator _OPER_(const AnalyticFunction<AnFunc>& u,                                  \
+    operator _OPER_(const AnalyticFunctionMultiSpace<AnFunc>& u,                        \
                     const Eigen::MatrixBase<Derived>& v) {                              \
    return _NAME_CLASS_<AnFunc>(*static_cast<const AnFunc*>(&u), v);                     \
 }                                                                                       \
 template <typename AnFunc, typename Derived> _NAME_CLASS_<AnFunc>                       \
     operator _OPER_(const Eigen::MatrixBase<Derived>& v,                                \
-                const AnalyticFunction<AnFunc>& u) {                                    \
+                const AnalyticFunctionMultiSpace<AnFunc>& u) {                          \
    return _NAME_CLASS_<AnFunc>(*static_cast<const AnFunc*>(&u), v);                     \
 }
 
-ANALYTICFUNCTION_OPERATOR_VECTOR_OVERLOAD(AnalyticFunctionSumVect,+)
-ANALYTICFUNCTION_OPERATOR_VECTOR_OVERLOAD(AnalyticFunctionMultVect,*)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_VECTOR_OVERLOAD(AnalyticFunctionMultiSpaceSumVect,+)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_VECTOR_OVERLOAD(AnalyticFunctionMultiSpaceMultVect,*)
 
 // ============
 // Operations with vectors (asymmetric)
 // ============
-#define ANALYTICFUNCTION_OPERATOR_VECTORASYMMETRIC_OVERLOAD(_NAME_CLASS_,_OPER_)        \
+#define ANALYTICFUNCTIONMULTISPACE_OPERATOR_VECTORASYMMETRIC_OVERLOAD(_NAME_CLASS_,_OPER_)  \
 template <typename AnFunc> class _NAME_CLASS_ :                                         \
-public AnalyticFunction<_NAME_CLASS_<AnFunc>> {                                         \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_<AnFunc>> {                               \
     const AnFunc& _u;                                                                   \
     const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> _v;              \
 public:                                                                                 \
@@ -238,12 +240,12 @@ public:                                                                         
     }                                                                                   \
 };                                                                                      \
 template <typename AnFunc, typename Derived> _NAME_CLASS_<AnFunc>                       \
-operator _OPER_(const AnalyticFunction<AnFunc>& u,                                      \
+operator _OPER_(const AnalyticFunctionMultiSpace<AnFunc>& u,                            \
                 const Eigen::MatrixBase<Derived>& v) {                                  \
    return _NAME_CLASS_<AnFunc>(*static_cast<const AnFunc*>(&u), v);                     \
 }                                                                                       \
 template <typename AnFunc> class _NAME_CLASS_ ## 1 :                                    \
-public AnalyticFunction<_NAME_CLASS_ ## 1<AnFunc>> {                                    \
+public AnalyticFunctionMultiSpace<_NAME_CLASS_ ## 1<AnFunc>> {                          \
     const AnFunc& _u;                                                                   \
     const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> _v;              \
 public:                                                                                 \
@@ -256,93 +258,93 @@ public:                                                                         
 };                                                                                      \
 template <typename AnFunc, typename Derived> _NAME_CLASS_ ## 1<AnFunc>                  \
 operator _OPER_(const Eigen::MatrixBase<Derived>& v,                                    \
-                const AnalyticFunction<AnFunc>& u) {                                    \
+                const AnalyticFunctionMultiSpace<AnFunc>& u) {                          \
    return _NAME_CLASS_ ## 1<AnFunc>(*static_cast<const AnFunc*>(&u), v);                \
 }
 
-ANALYTICFUNCTION_OPERATOR_VECTORASYMMETRIC_OVERLOAD(AnalyticFunctionSubVect,-)
-ANALYTICFUNCTION_OPERATOR_VECTORASYMMETRIC_OVERLOAD(AnalyticFunctionDivVect,/)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_VECTORASYMMETRIC_OVERLOAD(AnalyticFunctionMultiSpaceSubVect,-)
+ANALYTICFUNCTIONMULTISPACE_OPERATOR_VECTORASYMMETRIC_OVERLOAD(AnalyticFunctionMultiSpaceDivVect,/)
 
 // ============
 // Function of one Analytic Function
 // ============
-#define ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(_NAME_FUN_)                            \
-template <typename AnFunc> class AnalyticFunctionComp ## _NAME_FUN_ :                       \
-public AnalyticFunction<AnalyticFunctionComp ## _NAME_FUN_<AnFunc>> {                       \
+#define ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(_NAME_FUN_)                  \
+template <typename AnFunc> class AnalyticFunctionMultiSpaceComp ## _NAME_FUN_ :             \
+public AnalyticFunctionMultiSpace<AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>> {   \
     const AnFunc& _u;                                                                       \
 static auto internalFunc(const Real u){                                            \
             return std::_NAME_FUN_(u);};                                                    \
 template<class Derived> static auto internalFunc(const Derived& vec){                       \
             return _NAME_FUN_(vec.array()).matrix();};                                      \
 public:                                                                                     \
-    AnalyticFunctionComp ## _NAME_FUN_(const AnFunc& u): _u(u) {}                           \
+    AnalyticFunctionMultiSpaceComp ## _NAME_FUN_(const AnFunc& u): _u(u) {}                 \
     template <typename Derived> auto operator()                                             \
     (const Eigen::MatrixBase<Derived>& arrayOfPoints) const {                               \
         return internalFunc(_u(arrayOfPoints));                                             \
     }                                                                                       \
 };                                                                                          \
-template <typename AnFunc> AnalyticFunctionComp ## _NAME_FUN_<AnFunc>                       \
-        _NAME_FUN_(const AnalyticFunction<AnFunc>& u){                                      \
-        return AnalyticFunctionComp ## _NAME_FUN_<AnFunc>(                                  \
+template <typename AnFunc> AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>             \
+        _NAME_FUN_(const AnalyticFunctionMultiSpace<AnFunc>& u){                            \
+        return AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>(                        \
             *static_cast<const AnFunc*>(&u)); }                                             \
 
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(abs)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(exp)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(log)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(sqrt)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(sin)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(cos)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(tan)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(asin)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(acos)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(atan)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(sinh)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(cosh)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(tanh)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(asinh)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(acosh)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(atanh)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(ceil)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(floor)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(round)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(erf)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(erfc)
-ANALYTICFUNCTION_COMPOSITION_SINGLE_OVERLOAD(lgamma)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(abs)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(exp)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(log)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(sqrt)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(sin)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(cos)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(tan)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(asin)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(acos)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(atan)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(sinh)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(cosh)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(tanh)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(asinh)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(acosh)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(atanh)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(ceil)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(floor)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(round)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(erf)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(erfc)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLE_OVERLOAD(lgamma)
 
 // ============
 // Function of one Analytic Function (vector only)
 // ============
-#define ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(_NAME_FUN_)                         \
-template <typename AnFunc> class AnalyticFunctionComp ## _NAME_FUN_ :                       \
-public AnalyticFunction<AnalyticFunctionComp ## _NAME_FUN_<AnFunc>> {                       \
+#define ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(_NAME_FUN_)               \
+template <typename AnFunc> class AnalyticFunctionMultiSpaceComp ## _NAME_FUN_ :             \
+public AnalyticFunctionMultiSpace<AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>> {   \
     const AnFunc& _u;                                                                       \
 public:                                                                                     \
-    AnalyticFunctionComp ## _NAME_FUN_(const AnFunc& u): _u(u) {}                           \
+    AnalyticFunctionMultiSpaceComp ## _NAME_FUN_(const AnFunc& u): _u(u) {}                 \
     template <typename Derived> auto operator()                                             \
     (const Eigen::MatrixBase<Derived>& arrayOfPoints) const {                               \
         return _u(arrayOfPoints)._NAME_FUN_();                                              \
     }                                                                                       \
 };                                                                                          \
-template <typename AnFunc> AnalyticFunctionComp ## _NAME_FUN_<AnFunc>                       \
-        _NAME_FUN_(const AnalyticFunction<AnFunc>& u){                                      \
-        return AnalyticFunctionComp ## _NAME_FUN_<AnFunc>(                                  \
+template <typename AnFunc> AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>             \
+        _NAME_FUN_(const AnalyticFunctionMultiSpace<AnFunc>& u){                            \
+        return AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>(                        \
             *static_cast<const AnFunc*>(&u)); }                                             \
 
-//ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(conj)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(sum)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(prod)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(mean)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(minCoeff)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(maxCoeff)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(transpose)
-ANALYTICFUNCTION_COMPOSITION_SINGLEVEC_OVERLOAD(norm)
+//ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(conj)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(sum)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(prod)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(mean)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(minCoeff)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(maxCoeff)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(transpose)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEVEC_OVERLOAD(norm)
 
 // ============
 // Function of one Analytic Function with parameter
 // ============
-#define ANALYTICFUNCTION_COMPOSITION_SINGLEPARAM_OVERLOAD(_NAME_FUN_)                           \
-template <typename AnFunc> class AnalyticFunctionComp ## _NAME_FUN_ :                           \
-public AnalyticFunction<AnalyticFunctionComp ## _NAME_FUN_<AnFunc>> {                           \
+#define ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEPARAM_OVERLOAD(_NAME_FUN_)                 \
+template <typename AnFunc> class AnalyticFunctionMultiSpaceComp ## _NAME_FUN_ :                 \
+public AnalyticFunctionMultiSpace<AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>> {       \
     const AnFunc& _u;                                                                           \
     const Real _param;                                                                 \
 static auto internalFunc(const Real u, const Real param){                     \
@@ -350,106 +352,125 @@ static auto internalFunc(const Real u, const Real param){                     \
 template<class Derived> static auto internalFunc(const Derived& u, const Real param){  \
             return _NAME_FUN_(u.array(), param).matrix();};                                     \
 public:                                                                                         \
-    AnalyticFunctionComp ## _NAME_FUN_                                                          \
+    AnalyticFunctionMultiSpaceComp ## _NAME_FUN_                                                \
             (const AnFunc& u, const Real param): _u(u), _param(param) {}               \
     template <typename Derived> auto operator()                                                 \
     (const Eigen::MatrixBase<Derived>& arrayOfPoints) const {                                   \
         return internalFunc(_u(arrayOfPoints), _param);                                         \
     }                                                                                           \
 };                                                                                              \
-template <typename AnFunc> AnalyticFunctionComp ## _NAME_FUN_<AnFunc>                           \
-        _NAME_FUN_(const AnalyticFunction<AnFunc>& u, Real v){                         \
-        return AnalyticFunctionComp ## _NAME_FUN_<AnFunc>(                                      \
+template <typename AnFunc> AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>                 \
+        _NAME_FUN_(const AnalyticFunctionMultiSpace<AnFunc>& u, Real v){               \
+        return AnalyticFunctionMultiSpaceComp ## _NAME_FUN_<AnFunc>(                            \
             *static_cast<const AnFunc*>(&u),v); }                                               \
 
-ANALYTICFUNCTION_COMPOSITION_SINGLEPARAM_OVERLOAD(pow)
+ANALYTICFUNCTIONMULTISPACE_COMPOSITION_SINGLEPARAM_OVERLOAD(pow)
 
 // ============
 // Function of two Analytic Functions
 // ============
-template <typename AnFunc1, typename AnFunc2> class AnalyticFunctionCompDot :
-public AnalyticFunction <AnalyticFunctionCompDot<AnFunc1,AnFunc2>> {
+template <typename AnFunc1, typename AnFunc2> class AnalyticFunctionMultiSpaceCompDot :
+public AnalyticFunctionMultiSpace <AnalyticFunctionMultiSpaceCompDot<AnFunc1,AnFunc2>> {
     const AnFunc1& _u;
     const AnFunc2& _v;
 public:
-    AnalyticFunctionCompDot(const AnFunc1& u, const AnFunc2& v): _u(u), _v(v) {}
+    AnalyticFunctionMultiSpaceCompDot(const AnFunc1& u, const AnFunc2& v): _u(u), _v(v) {}
     template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
         return _u(arrayOfPoints).dot(_v(arrayOfPoints));
     }
 };
-template <typename AnFunc1, typename AnFunc2> AnalyticFunctionCompDot<AnFunc1, AnFunc2>
-    dot(const AnalyticFunction<AnFunc1>& u, const AnalyticFunction<AnFunc2>& v) {
-   return AnalyticFunctionCompDot<AnFunc1, AnFunc2>(
+template <typename AnFunc1, typename AnFunc2> AnalyticFunctionMultiSpaceCompDot<AnFunc1, AnFunc2>
+    dot(const AnalyticFunctionMultiSpace<AnFunc1>& u, const AnalyticFunctionMultiSpace<AnFunc2>& v) {
+   return AnalyticFunctionMultiSpaceCompDot<AnFunc1, AnFunc2>(
         *static_cast<const AnFunc1*>(&u),*static_cast<const AnFunc2*>(&v));
 }
 
-template <typename AnFunc1> class AnalyticFunctionCompDotConst :
-public AnalyticFunction <AnalyticFunctionCompDotConst<AnFunc1>> {
+template <typename AnFunc1> class AnalyticFunctionMultiSpaceCompDotConst :
+public AnalyticFunctionMultiSpace <AnalyticFunctionMultiSpaceCompDotConst<AnFunc1>> {
     const AnFunc1& _u;
     const Eigen::Matrix<Real, Eigen::Dynamic, 1> _v;
 public:
-    template <typename Derived> AnalyticFunctionCompDotConst(const AnFunc1& u, const Eigen::MatrixBase<Derived>& v): _u(u), _v(v) {}
+    template <typename Derived> AnalyticFunctionMultiSpaceCompDotConst(const AnFunc1& u, const Eigen::MatrixBase<Derived>& v): _u(u), _v(v) {}
     template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
         return _u(arrayOfPoints).dot(_v);
     }
 };
-template <typename AnFunc1, typename Derived> AnalyticFunctionCompDotConst<AnFunc1>
-    dot(const AnalyticFunction<AnFunc1>& u, const Eigen::MatrixBase<Derived>& v) {
-   return AnalyticFunctionCompDotConst<AnFunc1>(
+template <typename AnFunc1, typename Derived> AnalyticFunctionMultiSpaceCompDotConst<AnFunc1>
+    dot(const AnalyticFunctionMultiSpace<AnFunc1>& u, const Eigen::MatrixBase<Derived>& v) {
+   return AnalyticFunctionMultiSpaceCompDotConst<AnFunc1>(
         *static_cast<const AnFunc1*>(&u),v);
 }
-template <typename AnFunc1, typename Derived> AnalyticFunctionCompDotConst<AnFunc1>
-    dot(const Eigen::MatrixBase<Derived>& v, const AnalyticFunction<AnFunc1>& u) {
-   return AnalyticFunctionCompDotConst<AnFunc1>(
+template <typename AnFunc1, typename Derived> AnalyticFunctionMultiSpaceCompDotConst<AnFunc1>
+    dot(const Eigen::MatrixBase<Derived>& v, const AnalyticFunctionMultiSpace<AnFunc1>& u) {
+   return AnalyticFunctionMultiSpaceCompDotConst<AnFunc1>(
         *static_cast<const AnFunc1*>(&u),v);
 }
 
-template <typename AnFunc1, typename AnFunc2> class AnalyticFunctionCompCross :
-public AnalyticFunction <AnalyticFunctionCompCross<AnFunc1,AnFunc2>> {
+template <typename AnFunc1, typename AnFunc2> class AnalyticFunctionMultiSpaceCompCross :
+public AnalyticFunctionMultiSpace <AnalyticFunctionMultiSpaceCompCross<AnFunc1,AnFunc2>> {
     const AnFunc1& _u;
     const AnFunc2& _v;
 public:
-    AnalyticFunctionCompCross(const AnFunc1& u, const AnFunc2& v): _u(u), _v(v) {}
+    AnalyticFunctionMultiSpaceCompCross(const AnFunc1& u, const AnFunc2& v): _u(u), _v(v) {}
     template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
         return (_u(arrayOfPoints).cross(_v(arrayOfPoints)));
     }
 };
-template <typename AnFunc1, typename AnFunc2> AnalyticFunctionCompCross<AnFunc1, AnFunc2>
-    cross(const AnalyticFunction<AnFunc1>& u, const AnalyticFunction<AnFunc2>& v) {
-   return AnalyticFunctionCompCross<AnFunc1, AnFunc2>(
+template <typename AnFunc1, typename AnFunc2> AnalyticFunctionMultiSpaceCompCross<AnFunc1, AnFunc2>
+    cross(const AnalyticFunctionMultiSpace<AnFunc1>& u, const AnalyticFunctionMultiSpace<AnFunc2>& v) {
+   return AnalyticFunctionMultiSpaceCompCross<AnFunc1, AnFunc2>(
         *static_cast<const AnFunc1*>(&u),*static_cast<const AnFunc2*>(&v));
 }
 
-template <typename AnFunc1> class AnalyticFunctionCompCrossConst :
-public AnalyticFunction <AnalyticFunctionCompCrossConst<AnFunc1>> {
+template <typename AnFunc1> class AnalyticFunctionMultiSpaceCompCrossConst :
+public AnalyticFunctionMultiSpace <AnalyticFunctionMultiSpaceCompCrossConst<AnFunc1>> {
     const AnFunc1& _u;
     const Eigen::Matrix<Real, Eigen::Dynamic, 1> _v;
 public:
-    template <typename Derived> AnalyticFunctionCompCrossConst(const AnFunc1& u, const Eigen::MatrixBase<Derived>& v): _u(u), _v(v) {}
+    template <typename Derived> AnalyticFunctionMultiSpaceCompCrossConst(const AnFunc1& u, const Eigen::MatrixBase<Derived>& v): _u(u), _v(v) {}
     template <typename Derived> auto operator()(const Eigen::MatrixBase<Derived>& arrayOfPoints) const {
         return _u(arrayOfPoints).cross(_v);
     }
 };
-template <typename AnFunc1, typename Derived> AnalyticFunctionCompCrossConst<AnFunc1>
-    cross(const AnalyticFunction<AnFunc1>& u, const Eigen::MatrixBase<Derived>& v) {
-   return AnalyticFunctionCompCrossConst<AnFunc1>(
+template <typename AnFunc1, typename Derived> AnalyticFunctionMultiSpaceCompCrossConst<AnFunc1>
+    cross(const AnalyticFunctionMultiSpace<AnFunc1>& u, const Eigen::MatrixBase<Derived>& v) {
+   return AnalyticFunctionMultiSpaceCompCrossConst<AnFunc1>(
         *static_cast<const AnFunc1*>(&u),v);
 }
-template <typename AnFunc1, typename Derived> AnalyticFunctionCompCrossConst<AnFunc1>
-    cross(const Eigen::MatrixBase<Derived>& v, const AnalyticFunction<AnFunc1>& u) {
-    return AnalyticFunctionCompCrossConst<AnFunc1>(
+template <typename AnFunc1, typename Derived> AnalyticFunctionMultiSpaceCompCrossConst<AnFunc1>
+    cross(const Eigen::MatrixBase<Derived>& v, const AnalyticFunctionMultiSpace<AnFunc1>& u) {
+    return AnalyticFunctionMultiSpaceCompCrossConst<AnFunc1>(
         *static_cast<const AnFunc1*>(&u), -v);
 }
 
-extern AnalyticFunctionCoordinate x;
-extern AnalyticFunctionCoordinate y;
-extern AnalyticFunctionCoordinate z;
 
-extern AnalyticFunctionPoint      k;
-extern AnalyticFunctionCoordinate kx;
-extern AnalyticFunctionCoordinate ky;
-extern AnalyticFunctionCoordinate kz;
+
+
+// Initialisation of coordinates and points
+extern AnalyticFunctionMultiSpacePoint k0;
+extern AnalyticFunctionMultiSpacePoint k1;
+extern AnalyticFunctionMultiSpacePoint k2;
+extern AnalyticFunctionMultiSpacePoint k3;
+extern AnalyticFunctionMultiSpacePoint k4;
+
+extern AnalyticFunctionMultiSpacePointCoordinate k0x;
+extern AnalyticFunctionMultiSpacePointCoordinate k0y;
+extern AnalyticFunctionMultiSpacePointCoordinate k0z;
+extern AnalyticFunctionMultiSpacePointCoordinate k1x;
+extern AnalyticFunctionMultiSpacePointCoordinate k1y;
+extern AnalyticFunctionMultiSpacePointCoordinate k1z;
+extern AnalyticFunctionMultiSpacePointCoordinate k2x;
+extern AnalyticFunctionMultiSpacePointCoordinate k2y;
+extern AnalyticFunctionMultiSpacePointCoordinate k2z;
+extern AnalyticFunctionMultiSpacePointCoordinate k3x;
+extern AnalyticFunctionMultiSpacePointCoordinate k3y;
+extern AnalyticFunctionMultiSpacePointCoordinate k3z;
+extern AnalyticFunctionMultiSpacePointCoordinate k4x;
+extern AnalyticFunctionMultiSpacePointCoordinate k4y;
+extern AnalyticFunctionMultiSpacePointCoordinate k4z;
+
 
 } // namespace Tortoise
 
-#endif /* AnalyticFunction_hpp */
+
+#endif /* AnalyticFunctionMultiSpace_hpp */

@@ -113,6 +113,8 @@
 
 namespace Tortoise {
 
+namespace Algorithms {
+
 template <int nParameters, bool greedyExpansion = false> int minimizeNelderMead(
         const std::function<double(std::array<double, nParameters>)> &fun,  // Function to minimise
         const std::array<double, nParameters> &start,                       // Starting point
@@ -486,6 +488,7 @@ template <int nParameters, bool greedyExpansion> int minimizeNelderMead(
     return convergenceStatus;
 }
 
+} // namespace Algorithms 
 
 } // namespace Tortoise
 

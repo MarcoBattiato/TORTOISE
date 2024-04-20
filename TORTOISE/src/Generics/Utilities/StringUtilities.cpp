@@ -36,6 +36,10 @@
 
 #include <Generics/Utilities/StringUtilities.hpp>
 
+namespace Tortoise {
+
+namespace Utilities {
+
 // Taken from https://stackoverflow.com/questions/23457305/compare-strings-with-wildcard
 bool matchStringRec(const std::string &pattern, const std::string &candidate, int p, int c) {
   if (pattern[p] == '\0') {
@@ -63,3 +67,7 @@ std::string toString(int value,int digitsCount)
     os << std::setfill('0') << std::setw(digitsCount)<<value;
     return os.str();
 }
+
+} // namespace Utilities
+
+} // namespace Tortoise

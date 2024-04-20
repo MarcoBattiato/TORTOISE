@@ -38,6 +38,10 @@
 
 namespace Tortoise {
 
-RandomNGenerator randGen=RandomNGenerator();
+namespace Utilities {
+
+Utilities::RandomNGenerator randGen = Utilities::RandomNGenerator();
+
+} // namespace Utilities
 
 } // namespace Tortoise

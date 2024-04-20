@@ -36,7 +36,7 @@
 // It calculates the time propagation with Runge Kutta 4
 // It needs to work on a container that describes a function of time into a vector space
 // The easiest way to ensure that the container has all the necessary methods is to inherit UnivariateRelationContainer
-// and ensuring that containerArg in UnivariateRelationContainer is a container of Real type values like, for instance, double
+// and ensuring that containerArg in UnivariateRelationContainer is a container of real type values like, for instance, double
 // and that containerVal is a container of vectors on the containerArg.
 // The easiest way to ensure that is that the type containerVal::value_type inherits from VectorSpace
 //
@@ -82,6 +82,8 @@
 
 namespace Tortoise {
 
+namespace Algorithms {
+
 template <typename ContainerType, typename timeOpFunctType> void rungeKutta4
  (ContainerType&                                timeContainer,      // input/output
   const typename ContainerType::ArgType         finalTime,          // end time of propagation: notice that this is the final time and not the propagation time. If the last time in the container is larger that this, no time propagation will be done.
@@ -89,7 +91,7 @@ template <typename ContainerType, typename timeOpFunctType> void rungeKutta4
   timeOpFunctType                               timeOp              // operator that gives the derivative
 //  It must be > timeOp(ContainerType::ArgType currentTime, ContainerType::ValType currentY) -> ContainerType::ValType
 ) {
-    typedef typename ContainerType::ArgType  RealType;       // Short name for the Real type (for instance double)
+    typedef typename ContainerType::ArgType  RealType;       // Short name for the real type (for instance double)
     typedef typename ContainerType::ValType  vecType;        // Short name for the vector type (for instance
 
     vecType k0(timeContainer.back()),
@@ -125,7 +127,7 @@ template <typename ContainerType, typename timeOpFunctType, typename outputFunct
   outputFunctType                               outputFunct         // Defines some output operations
 //  It must be in the form > outputFunct(ContainerType::ArgType currentTime, ContainerType::ValType currentY) -> void
 ) {
-    typedef typename ContainerType::ArgType  RealType;       // Short name for the Real type (for instance double)
+    typedef typename ContainerType::ArgType  RealType;       // Short name for the real type (for instance double)
     typedef typename ContainerType::ValType  vecType;        // Short name for the vector type (for instance
 
     vecType k0(timeContainer.back()),
@@ -163,7 +165,7 @@ template <typename ContainerType, typename timeOpFunctType, typename toExecuteFu
   toExecuteFunctType                            toExecuteFunct,     // function that will be executed at every time step (used to enforce certain properties to solution, beyond RK)
   outputFunctType                               outputFunct         // Defines some output operations
 ) {
-    typedef typename ContainerType::ArgType  RealType;       // Short name for the Real type (for instance double)
+    typedef typename ContainerType::ArgType  RealType;       // Short name for the real type (for instance double)
     typedef typename ContainerType::ValType  vecType;        // Short name for the vector type (for instance
 
     vecType k0(timeContainer.back()),
@@ -192,7 +194,7 @@ template <typename ContainerType, typename timeOpFunctType, typename toExecuteFu
 }
 
 
-
+} // namespace Algorithms 
 
 } // namespace Tortoise
 #endif /* RungeKutta4_hpp */

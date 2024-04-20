@@ -41,7 +41,7 @@
 
 // #define NDEBUG            // Uncomment to deactivate debug mode
 
-#include <TORTOISE>
+#include "DiscretizationCore.hpp"
 #include <iostream>
 #include <functional>
 

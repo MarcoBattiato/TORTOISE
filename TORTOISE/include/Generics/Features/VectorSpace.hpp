@@ -39,6 +39,8 @@
 
 namespace Tortoise {
 
+namespace Features {
+
 template <class groupType> class GroupSpace {
 public:
 //    virtual groupType& operator+=(const groupType& other) = 0;
@@ -106,6 +108,8 @@ public:
         return -rhs;
     }
 };
+
+} // namespace Features
 
 } // namespace Tortoise 
 

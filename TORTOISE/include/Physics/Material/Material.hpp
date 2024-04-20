@@ -68,7 +68,7 @@ template<int NDim> class Material :                 // NDim = Number of Dimensio
 // or
 // for (auto i : materialname.matchList("electr*")) { *i;}
 // IMPORTANT: append bands only using the method provided
-public StringMap<Band<NDim>>
+public Containers::StringMap<Band<NDim>>
 
 {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,16 +80,15 @@ public:
     const std::string               matID;          // Stores the ID of the material
     const Region<NDim>*             region;         // Origin of the reciprocal lattice unit cell (which we will incorrectly call BZ)
 
-    StringMap<ScatteringChannel<NDim,2>> scatteringChannelsList2Legs;
-    StringMap<ScatteringChannel<NDim,3>> scatteringChannelsList3Legs;
-    StringMap<ScatteringChannel<NDim,4>> scatteringChannelsList4Legs;
+    Containers::StringMap<ScatteringChannel<NDim,2>> scatteringChannelsList2Legs;
+    Containers::StringMap<ScatteringChannel<NDim,3>> scatteringChannelsList3Legs;
+    Containers::StringMap<ScatteringChannel<NDim,4>> scatteringChannelsList4Legs;
     
     // Default values used when creating a new scattering. The scattering will be constructed with these default values,
     // yet, the values can be modified within each scattering
     int                             defaultNMCPointsScatterings = 50;    // Default value of MC points for newly created scatterings
     Real                            defaultMinimumDeterminantScatterings = 1.e-9;
     Real                            defaultScattElemeThresholdScatterings = 1.e-9;
-
 
     
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -106,9 +105,9 @@ public:
     //=======================================================
     // Material construction: Bands
     //===================
-    void addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Function<NDim>& t_dispersion);
-    void addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const std::function<Real(Point<NDim>)>& t_dispersion);
-    void addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const Real t_dispersion);
+    Band<NDim>& addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Function<NDim>& t_dispersion);
+    Band<NDim>& addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const std::function<Real(Point<NDim>)>& t_dispersion);
+    Band<NDim>& addBand(const std::string &t_id, const Real t_charge, const Real t_statistics, const Mesh<NDim> &t_mesh, const Real t_dispersion);
     
     //=======================================================
     // Material construction: Scattering Channels
@@ -125,13 +124,48 @@ public:
     
     template<int NLegs> std::vector<ScatteringChannel<NDim,NLegs>*> scatteringChannelMatchList(const std::array<std::string, NLegs>& bandsNamesWildCards, const std::array<scattLegDirection, NLegs>& t_legDirection);
     
+    //=======================================================
+    // Scattering Initialisation
+    //===================
+    void constructMCPoints();
+    
+    //=======================================================
+    // Material Analysis
+    //===================
     template<int NLegs> Function<NDim> scatteringRates(const std::array<std::string, NLegs>& bandsNamesWildCards, const std::array<scattLegDirection, NLegs>& t_legDirection, const MaterialStatus<NDim>& status, const std::string& bandName);
+    template<int NLegs> Function<NDim> selectivePropagation(const std::array<std::string, NLegs>& bandsNamesWildCards, const std::array<scattLegDirection, NLegs>& t_legDirection, const MaterialStatus<NDim>& status, const std::string& bandName);
+    
+    //=======================================================
+    // Utilities
+    //===================
+    // In case of typical applications in Materials and for light in the infrared or optical range, the light momentum is nearly 0 and the effect of the
+    // light's finite momentum is negligible in typical scatterings. In these cases, the only important charactestic of light is its energy.
+    // Therefore specifying the correct momentum of light becomes a waste of time. Furthermore it can create problems since the momentum can be so small
+    // that it can hit the limits of numerical precision.
+    // The methods below provide an easy way of setting up good meshes and dispersions for optical photons
+    // WARNING: these methods should not be used when the momentum of the photon is relevant like in laser cooling or high energy photons.
+    
+    // The method below returns a mesh suitable for the construction of photon bands. The photon momentum is set to be very close to k = (0,0,0)
+    // The user must save the returned mesh into a variable that must live as long as the material does
+    Mesh<NDim> photonMesh(int resolution) const;
+    // The method below adds a photon band to the material
+    // Several photon bands can be added using the same mesh (for instance in the case different photon bands are required to describe different frequency ranges
+    void addPhotonBand(const std::string &t_id, Mesh<NDim> const& photonMesh, Real lowestEnergy, Real highestEnergy);
+    // This prevents that a temporary mesh is used 
+    void addPhotonBand(const std::string &t_id, Mesh<NDim> const&& photonMesh, Real lowestEnergy, Real highestEnergy) = delete;
     
     //********************************
     //* I/O
     //********************************
     void plot() const;
     void plot(const std::vector<std::string> &bandstoplot) const;
+    
+    template<typename Derived, typename... Args> void addSeriesSpaghettiPoints(const Eigen::MatrixBase<Derived>& point, const std::string& namePoint, Args... args)  requires (NDim==2);
+    
+    void spaghettiPlot() const;
+    void spaghettiPlot(std::string const & bandstoplotWildcards) const;
+    void spaghettiPlot(const std::vector<std::string>& bandstoplot) const;
+    
         
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,6 +174,16 @@ public:
 //~~~~~~~~~~~~~~~~~~
     // The user should not add bands except with the methods provided by Material so some of StringMap's methods are made private
     // https://stackoverflow.com/questions/4908539/a-way-in-c-to-hide-a-specific-function
+    // Remove the possibility of passing temporaries to the constructor
+    Material(const std::string &t_matid, const Region<NDim>&& t_region) = delete;
+    
+//private:
+    template<typename Derived, typename... Args> void addSeriesSpaghettiPointsRecursion(const Eigen::MatrixBase<Derived>& point, const std::string& namePoint, Args... args) requires (NDim==2) ;
+    template<typename Derived> void addSeriesSpaghettiPointsRecursion(const Eigen::MatrixBase<Derived>& point, const std::string& namePoint) requires (NDim==2);
+    
+    // Data for spaghetti plot
+    std::vector<VectorPoint<NDim>>             seriesSpaghettiPoints;
+    std::vector<std::vector<std::string>>      seriesSpaghettiPointsNames;
 
 };
 
@@ -150,6 +194,40 @@ public:
 //~~~~~~~~~~~~~~~~~~
 Plotter3D& operator << (Plotter3D& plotter, const Material<2>& region);
 template<int NDim> std::ostream &operator<<(std::ostream &os, Material<NDim> const& material);
+
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Technical details
+//~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~
+
+template<int NDim> template<typename Derived> void Material<NDim>::addSeriesSpaghettiPointsRecursion(const Eigen::MatrixBase<Derived>& point, const std::string& namePoint) requires (NDim==2) {
+    seriesSpaghettiPoints.back().conservativeResize(Eigen::NoChange, seriesSpaghettiPoints.back().cols()+1);
+    seriesSpaghettiPoints.back().col(seriesSpaghettiPoints.back().cols()-1) = point;
+    seriesSpaghettiPointsNames.back().emplace_back(namePoint);
+}
+
+template<int NDim> template<typename Derived, typename... Args> void Material<NDim>::addSeriesSpaghettiPointsRecursion(const Eigen::MatrixBase<Derived>& point, const std::string& namePoint, Args... args) requires (NDim==2) {
+    seriesSpaghettiPoints.back().conservativeResize(Eigen::NoChange, seriesSpaghettiPoints.back().cols()+1);
+    seriesSpaghettiPoints.back().col(seriesSpaghettiPoints.back().cols()-1) = point;
+    seriesSpaghettiPointsNames.back().emplace_back(namePoint);
+    addSeriesSpaghettiPointsRecursion(args...);
+}
+
+template<int NDim> template<typename Derived, typename... Args> void Material<NDim>::addSeriesSpaghettiPoints(const Eigen::MatrixBase<Derived>& point, const std::string& namePoint, Args... args) requires (NDim==2) {
+    VectorPoint<NDim> points;
+    points.resize(Eigen::NoChange, 1);
+    points.col(0) = point;
+    seriesSpaghettiPoints.emplace_back(points);
+    std::vector<std::string> names({namePoint});
+    seriesSpaghettiPointsNames.emplace_back(names);
+    addSeriesSpaghettiPointsRecursion(args...);
+}
+
+
 
 };   // namespace Tortoise
 

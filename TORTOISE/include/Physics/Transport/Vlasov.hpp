@@ -40,23 +40,25 @@
 
 #include <Geometry/Structured/FunctionSpace/Function.hpp>
 
+using namespace Tortoise::GeometryCore;
+
 namespace Tortoise {
 
 //template <int NDim, int order> const ArrayPoint<NDim,ngausspoint(NDim,order)> gaussPoints;
 
-template <int NDim, int order> const std::vector< Eigen::Matrix<Real, NDim, ngausspoint(NDim-1,order)>, Eigen::aligned_allocator<Eigen::Matrix<Real, NDim, ngausspoint(NDim-1,order)>> > gaussPointsSide;
+template <int NDim, int order> const std::vector< Eigen::Matrix<Real, NDim, GeometryCore::ngausspoint(NDim-1,order)>, Eigen::aligned_allocator<Eigen::Matrix<Real, NDim, GeometryCore::ngausspoint(NDim-1,order)>> > gaussPointsSide;
 
 // 2D
 // ==============
-template<int order> const inline std::vector< Eigen::Matrix<Real, 2, ngausspoint(1,order)>, Eigen::aligned_allocator<Eigen::Matrix<Real, 2, ngausspoint(1,order)>> > gaussPointsSide<2,order> = []{
-    std::vector< Eigen::Matrix<Real, 2, ngausspoint(1,order)>, Eigen::aligned_allocator<Eigen::Matrix<Real, 2, ngausspoint(1,order)>> > tmp;
-    tmp.emplace_back(Eigen::Matrix<Real, 2, ngausspoint(1,order)>::Zero());
-    tmp.emplace_back(Eigen::Matrix<Real, 2, ngausspoint(1,order)>::Zero());
-    tmp.emplace_back(Eigen::Matrix<Real, 2, ngausspoint(1,order)>::Zero());
-    tmp[0].row(0) = (1.-gaussPoints<1,order>.array()).matrix();
-    tmp[0].row(1) = gaussPoints<1,order>;
-    tmp[1].row(1) = gaussPoints<1,order>;
-    tmp[2].row(0) = gaussPoints<1,order>;
+template<int order> const inline std::vector< Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>, Eigen::aligned_allocator<Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>> > gaussPointsSide<2,order> = []{
+    std::vector< Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>, Eigen::aligned_allocator<Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>> > tmp;
+    tmp.emplace_back(Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>::Zero());
+    tmp.emplace_back(Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>::Zero());
+    tmp.emplace_back(Eigen::Matrix<Real, 2, GeometryCore::ngausspoint(1,order)>::Zero());
+    tmp[0].row(0) = (1.-GeometryCore::gaussPoints<1,order>.array()).matrix();
+    tmp[0].row(1) = GeometryCore::gaussPoints<1,order>;
+    tmp[1].row(1) = GeometryCore::gaussPoints<1,order>;
+    tmp[2].row(0) = GeometryCore::gaussPoints<1,order>;
     return tmp;}();
 
 
@@ -79,8 +81,10 @@ public:
         // We can therefore only include the first coefficient
         Function<NDim> toreturn(density.mesh);
         for (int dim=0; dim < NDim; ++dim){
-            Eigen::Map<const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> elementviewderiv(density.mesh->basisFuncDerivLF0thOrd[dim].data(),  density.mesh->numberElements, density.mesh->nVertElement);
-            Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> intermediate(elementviewderiv.array().colwise() * (apply(density.elementview(),gaussPoints<NDim,2>)* gaussWeigths<NDim,2>.transpose()).array());
+            Eigen::Map<const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> 
+                elementviewderiv(density.mesh->basisFuncDerivLF0thOrd[dim].data(),  density.mesh->numberElements, density.mesh->nVertElement);
+            Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
+                intermediate(elementviewderiv.array().colwise() * (apply(density.elementview(),GeometryCore::gaussPoints<NDim,2>)* GeometryCore::gaussWeigths<NDim,2>.transpose()).array());
             DataVector partialVolIntegral(Eigen::Map<DataVector>(intermediate.data(), intermediate.cols()*intermediate.rows()));
             toreturn.vec += density.mesh->elemVolume * velocity(dim) * partialVolIntegral;
         }
@@ -92,7 +96,7 @@ public:
         for (int elem=0; elem < density.mesh->numberElements; ++elem){
             for (int basis=0; basis < density.mesh->nVertElement; ++basis){
                 for (int side=0; side < density.mesh->nVertElement; ++side){
-                    LinearForm<NDim> basisFunc (LinearForm<NDim>::Zero() );
+                    GeometryCore::LinearForm<NDim> basisFunc (GeometryCore::LinearForm<NDim>::Zero() );
                     basisFunc(basis)=1.;
                     Real vel_SurfNorm_scalarProd = velocity.dot(density.mesh->faceNormal(elem,side));
                     int elemToInteg, sideToIntegr;
@@ -106,7 +110,7 @@ public:
                     toreturn.vec(0,elem*(NDim+1)+basis) += vel_SurfNorm_scalarProd *
                     ( apply(basisFunc, gaussPointsSide<NDim,2>[side]).array() *
                      apply(density.vec.template block<1,Mesh<NDim>::nVertElement>(0,elemToInteg*(NDim+1)), gaussPointsSide<NDim,2>[sideToIntegr]).array() *
-                     gaussWeigths<NDim-1,2>.array() ).sum()  * density.mesh->faceArea(elem, side);
+                     GeometryCore::gaussWeigths<NDim-1,2>.array() ).sum()  * density.mesh->faceArea(elem, side);
                 }
             }
         }
@@ -118,7 +122,7 @@ public:
         for (int elem=0; elem < density.mesh->numberElements; ++elem){
             for (int basis=0; basis < density.mesh->nVertElement; ++basis){
                 for (int side=0; side < density.mesh->nVertElement; ++side){
-                    LinearForm<NDim> basisFunc (LinearForm<NDim>::Zero() );
+                    GeometryCore::LinearForm<NDim> basisFunc (GeometryCore::LinearForm<NDim>::Zero() );
                     basisFunc(basis)=1.;
                     Real vel_SurfNorm_scalarProd = velocity.dot(density.mesh->faceNormal(elem,side));
                     // Outgoing flux
@@ -126,14 +130,14 @@ public:
                     toreturn.vec(0,elem*(NDim+1)+basis) += 0.5 * vel_SurfNorm_scalarProd *
                     ( apply(basisFunc, gaussPointsSide<NDim,2>[side]).array() *
                     apply(density.vec.template block<1,Mesh<NDim>::nVertElement>(0,elemToInteg*(NDim+1)), gaussPointsSide<NDim,2>[sideToIntegr]).array() *
-                    gaussWeigths<NDim-1,2>.array() ).sum()  * density.mesh->faceArea(elem, side);
+                     GeometryCore::gaussWeigths<NDim-1,2>.array() ).sum()  * density.mesh->faceArea(elem, side);
                     // Ingoing flux
                     elemToInteg = density.mesh->adjacentElement(elem, side);
                     sideToIntegr = density.mesh->adjacentFace(elem, side);
                     toreturn.vec(0,elem*(NDim+1)+basis) += vel_SurfNorm_scalarProd *
                     ( apply(basisFunc, gaussPointsSide<NDim,2>[side]).array() *
                      apply(density.vec.template block<1,Mesh<NDim>::nVertElement>(0,elemToInteg*(NDim+1)), gaussPointsSide<NDim,2>[sideToIntegr]).array() *
-                     gaussWeigths<NDim-1,2>.array() ).sum()  * density.mesh->faceArea(elem, side);
+                     GeometryCore::gaussWeigths<NDim-1,2>.array() ).sum()  * density.mesh->faceArea(elem, side);
                 }
             }
         }
