@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Build output
+*.o
+*.d
+*.a
+*.out
+build/
+bin/
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcshareddata/
+DerivedData/
+
+# Editors
+.vscode/
+.idea/
