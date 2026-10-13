@@ -44,6 +44,8 @@
 
 using namespace Tortoise;
 using std::cout;
+using Tortoise::AnalyticExpression::kx, Tortoise::AnalyticExpression::ky, Tortoise::AnalyticExpression::kz, Tortoise::AnalyticExpression::k;
+using Tortoise::AnalyticExpression::x, Tortoise::AnalyticExpression::y, Tortoise::AnalyticExpression::z;
 
 int main(int argc, const char * argv[]) {
     

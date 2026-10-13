@@ -41,6 +41,10 @@
 
 using namespace Tortoise;
 using std::cout;
+using Tortoise::AnalyticExpression::kx, Tortoise::AnalyticExpression::ky, Tortoise::AnalyticExpression::kz, Tortoise::AnalyticExpression::k;
+using Tortoise::AnalyticExpression::x, Tortoise::AnalyticExpression::y, Tortoise::AnalyticExpression::z;
+using Tortoise::Utilities::toString;
+using Tortoise::Utilities::stopWatch;
 
 int main(int argc, const char * argv[]) {
     
@@ -99,7 +103,7 @@ int main(int argc, const char * argv[]) {
     
     // The time evolution is calculated in the same way. TORTOISE will see that one of the bands is constrained and act accordingly
     stopWatch.tic();
-    evolution.propagateDeterministic(5., 1.);
+    evolution.propagate(5., 1.);
     cout << "Time taken for time propagation: " << stopWatch.toc() << "s\n";
     
     for (auto elBand : exMat.matchListId("el:*")){

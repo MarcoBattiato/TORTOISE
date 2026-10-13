@@ -12,6 +12,10 @@
 
 using namespace Tortoise;
 using std::cout;
+using Tortoise::AnalyticExpression::kx, Tortoise::AnalyticExpression::ky, Tortoise::AnalyticExpression::kz, Tortoise::AnalyticExpression::k;
+using Tortoise::AnalyticExpression::x, Tortoise::AnalyticExpression::y, Tortoise::AnalyticExpression::z;
+using Tortoise::Utilities::stopWatch;
+using Tortoise::Utilities::Interpolator;
 
 template <int NDim> Function<1> functVsFunct(const Function<NDim>& funcx, const Function<NDim>& funcy, const Mesh<1> mesh){
     assert(funcx.mesh == funcy.mesh);
@@ -96,7 +100,7 @@ int main(int argc, const char * argv[]) {
     // *** Time evolution with laser excitation
     MaterialTimeStatus<2> thermDyn(equil);
     stopWatch.tic();
-    thermDyn.propagateDeterministic(5, 1.);
+    thermDyn.propagate(5, 1.);
     cout << "Time taken for time propagation: " << stopWatch.toc() << "s\n";
     
     for (auto elBand : exMat.matchListId("el:*")){

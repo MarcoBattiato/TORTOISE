@@ -43,6 +43,10 @@
 
 using namespace Tortoise;
 using std::cout;
+using Tortoise::AnalyticExpression::kx, Tortoise::AnalyticExpression::ky, Tortoise::AnalyticExpression::kz, Tortoise::AnalyticExpression::k;
+using Tortoise::AnalyticExpression::x, Tortoise::AnalyticExpression::y, Tortoise::AnalyticExpression::z;
+using Tortoise::Utilities::toString;
+using Tortoise::Utilities::stopWatch;
 
 int main(int argc, const char * argv[]) {
     
@@ -116,7 +120,7 @@ int main(int argc, const char * argv[]) {
     
     stopWatch.tic(); // We start the timer
     // We can now propagate simply with
-    evolution.propagateDeterministic(5., 1.);
+    evolution.propagate(5., 1.);
     // The first value is the final time and the second value is the time at which we want TORTOISE to
     // add a population within evolution. In other words, the second value is the dense time step.
     // Please notice that the dense time step does not control the precision, it only specifies how

@@ -172,6 +172,10 @@ template<> template<> ScatteringChannel<_NDIM_,_NLEGS_>* Material<_NDIM_>::addSc
     scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].numMCPoints = defaultNMCPointsScatterings;                    \
     scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].minimumDeterminant = defaultMinimumDeterminantScatterings;    \
     scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].scattElemeThreshold = defaultScattElemeThresholdScatterings;  \
+    scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].constructMCPoints();                                          \
+    scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].precalculateIndices();                                        \
+    scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].numberScatteringElements =                                    \
+        scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].scatteringMatrixIndices.size();                           \
     return &scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1];                                                      \
 }
 CONSTRUCT_ADDSCATTERINGCHANNEL(1,2)
@@ -193,6 +197,10 @@ template<> template<> ScatteringChannel<_NDIM_,_NLEGS_>* Material<_NDIM_>::addSc
     scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].numMCPoints = defaultNMCPointsScatterings;                    \
     scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].minimumDeterminant = defaultMinimumDeterminantScatterings;    \
     scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].scattElemeThreshold = defaultScattElemeThresholdScatterings;  \
+    scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].constructMCPoints();                                          \
+    scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].precalculateIndices();                                        \
+    scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].numberScatteringElements =                                    \
+        scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1].scatteringMatrixIndices.size();                           \
     return &scatteringChannelsList##_NLEGS_##Legs[scatteringChannelsList##_NLEGS_##Legs.size()-1];                                                      \
 }
 CONSTRUCT_ADDSCATTERINGCHANNELSTRING(1,2)

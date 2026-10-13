@@ -46,7 +46,7 @@ int main(int argc, const char * argv[]) {
     startPopul["el:C0"].plot();
     
     MaterialTimeStatus<1>   thermalDynamics(startPopul);
-    thermalDynamics.propagateDeterministic(50, 2.);
+    thermalDynamics.propagate(50, 2.);
     
     for(int i=0; i < thermalDynamics.size(); ++i){
         plotter2d << thermalDynamics[i]["el:C0"] << LABEL(std::to_string(thermalDynamics.arg(i)));
