@@ -41,14 +41,22 @@
 
 // #define NDEBUG            // Uncomment to deactivate debug mode
 
-#include "DiscretizationCore.hpp"
+#include <DiscretizationCore>
 #include <iostream>
 #include <functional>
 
 using namespace Tortoise;
 using std::cout;
+using Tortoise::AnalyticExpression::kx, Tortoise::AnalyticExpression::ky, Tortoise::AnalyticExpression::kz, Tortoise::AnalyticExpression::k;
+using Tortoise::AnalyticExpression::x, Tortoise::AnalyticExpression::y, Tortoise::AnalyticExpression::z;
 
 int main(int argc, const char * argv[]) {
+    
+    // Region and mesh used throughout this tutorial (see tutorialDev3 for how they work)
+    Point<2>  origin({0.0,-0.1});
+    Point<2>  sideRegion0({1.0,0.1}), sideRegion1({.1,1.1});
+    Region<2> region(origin, {sideRegion0, sideRegion1} );
+    Mesh<2>   myMesh(region, Point<2>({0.1,0.2}), Point<2>({0.6,0.5}),CartIndex<2>({4,3}));
     
     //**********************
     // Function (Function.hpp)
@@ -81,7 +89,7 @@ int main(int argc, const char * argv[]) {
     
     // This construct a new discretised function as the result of some expression of another discretised function
     Function<2> funct4([](Real z){return 1./z;}, funct2);
-    Function<2> funct4_1(1./x, funct2);
+    // (Analytic expressions such as 1./x cannot be used here: these constructors take a plain function of the values)
     // Notice nhow it is not necessary to pass a mesh, since this constructor creates a function object on the same
     // mesh of funct2, and initialises it to 1/funct2(x,y)
     
@@ -89,7 +97,6 @@ int main(int argc, const char * argv[]) {
     Function<2> funct5([](std::vector<Real> z){return 1./z[0] + 3.*z[0]*z[1];}, {funct2, funct3});
     // Creates a function object on the same mesh of funct2, and initialises it to 1/funct2(x,y) + funct2(x,y) * funct3(x,y)
     // Notice that if funct2 and funct3 are defined on different meshes, the constructor will return an error
-    Function<2> funct5_1(1./x + 3.* x * y, {funct2, funct3});
     
     // Of course the usual copy constructor is provided
     Function<2> funct6(funct3);    // Makes a new function, copying funct4

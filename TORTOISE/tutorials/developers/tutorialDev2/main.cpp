@@ -41,7 +41,7 @@
 
 // #define NDEBUG            // Uncomment to deactivate debug mode
 
-#include "DiscretizationCore.hpp"
+#include <DiscretizationCore>
 #include <iostream>
 
 using namespace Tortoise;
@@ -88,9 +88,8 @@ int main(int argc, const char * argv[]) {
     // On Windows it might look something like
     // plotter3d.gnuplotcommand = "C:\\Users\\admin\\gnuplot\\bin\\gnuplot.exe";
 
-    plotter3d.gnuplotcommand = "/usr/local/bin/gnuplot > /dev/null 2>&1";
-    
-    // It is however possible to directly modify this parameter in Includes/Configuration.hpp
+    // gnuplotcommand is now fixed when the plotter is constructed, so the path to GNUPlot
+    // has to be set in include/Configuration (DEFAULTGNUPLOTCOMMAND)
     
     // To plot something, it is necessary to send it to the plotter3d object with the << operator
     
@@ -237,7 +236,7 @@ int main(int argc, const char * argv[]) {
     // There is also a plotter for 2D plots
     // It works in the same way, but before using it we need to remember to specify the command to starg GNUPlot
 
-    plotter2d.gnuplotcommand = "/usr/local/bin/gnuplot > /dev/null 2>&1";
+    // plotter2d.gnuplotcommand is set in include/Configuration (DEFAULTGNUPLOTCOMMAND)
 
     
     

@@ -41,7 +41,7 @@
 
 // #define NDEBUG            // Uncomment to deactivate debug mode
 
-#include "DiscretizationCore.hpp"
+#include <DiscretizationCore>
 #include <iostream>
 #include <functional>
 

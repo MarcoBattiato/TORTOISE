@@ -34,7 +34,7 @@
 //  Created by Marco Battiato on 24/9/21.
 //
 
-#include "AnalyticFunctionMultiSpace.hpp"
+#include <Geometry/AnalyticExpressions/AnalyticFunctionMultiSpace.hpp>
 
 namespace Tortoise {
 

@@ -13,7 +13,7 @@
 #include <array>
 #include <tuple>
 #include <cmath>
-#include <NearestNeighbourInterpolator.hpp>
+#include <Generics/MachineLearning/NearestNeighbourInterpolator.hpp>
 
 using std::cout, std::vector, std::string, std::array;
 using namespace Tortoise;

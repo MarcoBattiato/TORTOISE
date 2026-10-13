@@ -5,7 +5,7 @@
 //  Created by Marco Battiato on 16/11/22.
 //
 
-#include "Interpolator2D.hpp"
+#include <Generics/Utilities/Interpolator2D.hpp>
 
 namespace Tortoise {
 

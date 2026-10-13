@@ -5,4 +5,4 @@
 //  Created by Marco Battiato on 5/11/22.
 //
 
-#include "Reticulation.hpp"
+#include <Geometry/Structured/DirectSpace/Reticulation.hpp>

@@ -82,7 +82,7 @@
 // MiscUtilities.hpp is a collaction of utilities that I programmed and turned out useful for a number of uses of TORTOISE. We will see later what is provided.
 
 
-#include "DiscretizationCore.hpp"
+#include <DiscretizationCore>
 #include <iostream>
 
 // All the classes in TORTOISE are within the namespace Totroise. Therefore all classes and objects within TORTOISE need to be called with Tortoise::name_of_class

@@ -9,6 +9,9 @@
 #define BandStructureConstruction_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <cassert>
+#include <Eigen/Dense>
 
 template <typename IDType, typename EigenDerived0, typename EigenDerived1>
 std::vector<IDType> assignIndicesBySimilarity(const Eigen::MatrixBase<EigenDerived0>& vectorsToClassify,
